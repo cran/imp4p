@@ -1,7 +1,10 @@
 
 #Function to impute data sets with the SLSA algorithm
 
-impute.slsa <- function(tab, conditions, repbio, reptech, nknn=15, selec="all", weight=1, ind.comp=1, progress.bar=TRUE){
+impute.slsa <- function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec="all", weight=1, ind.comp=1, progress.bar=TRUE){
+  
+  if (is.null(repbio)){repbio=as.factor(1:length(conditions));}
+  if (is.null(reptech)){reptech=as.factor(1:length(conditions));}
   
   tab_imp=as.matrix(tab);
   
@@ -21,6 +24,8 @@ impute.slsa <- function(tab, conditions, repbio, reptech, nknn=15, selec="all", 
     
     xincomplete1=tab_imp[,(k:(k+nb_rep[n]-1))];
     
+    asd=apply(xincomplete1,1,sd,na.rm=T);
+
     #Imputation function for each row
     imputeHLS=function(roww){
       #Progress bar
@@ -152,6 +157,12 @@ impute.slsa <- function(tab, conditions, repbio, reptech, nknn=15, selec="all", 
           
           #final imputation by weighting the observed responses
           roww[row.exp]<-apply(y, 2, function(x){xx=x[!is.na(x)];ww=w[!is.na(x)];ww[1:min(c(nknn,length(ww)))]=ww[1:min(c(nknn,length(ww)))]/sum(ww[1:min(c(nknn,length(ww)))]);sum(ww[1:min(c(nknn,length(ww)))]*xx[1:min(c(nknn,length(ww)))]);})
+        
+          #to avoid outliers
+          l.ol=sum(roww[row.exp]<(mean(roww[-row.exp])-2*quantile(asd,probs=0.9,na.rm=T)));
+          l.ou=sum(roww[row.exp]>(mean(roww[-row.exp])+2*quantile(asd,probs=0.9,na.rm=T)));
+          if (l.ol>0){roww[row.exp][(roww[row.exp]<(mean(roww[-row.exp])-2*quantile(asd,probs=0.9,na.rm=T)))]=(mean(roww[-row.exp])-rnorm(length(roww[row.exp][(roww[row.exp]<(mean(roww[-row.exp])-2*quantile(asd,probs=0.9,na.rm=T)))]),mean=2,sd=0.005)*quantile(asd,probs=0.9,na.rm=T));};
+          if (l.ou>0){roww[row.exp][(roww[row.exp]>(mean(roww[-row.exp])+2*quantile(asd,probs=0.9,na.rm=T)))]=(mean(roww[-row.exp])+rnorm(length(roww[row.exp][(roww[row.exp]>(mean(roww[-row.exp])+2*quantile(asd,probs=0.9,na.rm=T)))]),mean=2,sd=0.005)*quantile(asd,probs=0.9,na.rm=T));};
         }
       }
       

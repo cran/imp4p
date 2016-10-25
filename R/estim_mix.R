@@ -5,7 +5,7 @@
 #
 ####################################
 
-estim.mix=function(tab, tab.imp, conditions, x.min=20, x.max=30, x.step.mod=300, x.step.pi=300, nb.rei=100, method=2, gridsize=300){
+estim.mix=function(tab, tab.imp, conditions, x.min=20, x.max=30, x.step.mod=300, x.step.pi=300, nb.rei=100, method=3, gridsize=300){
   
   #require(Iso);
   
@@ -203,7 +203,7 @@ estim.mix=function(tab, tab.imp, conditions, x.min=20, x.max=30, x.step.mod=300,
         dder=diff(distance[2:length(distance)])-diff(distance[1:(length(distance)-1)]);
         pi_mcar[j] <- 1-(which.max(dder)+1)/gridsize;
       }
-      
+      pi_mcar[j] = max(min(pi_mcar[j],1-1e-5),1e-5);
       pi.trend[,j]=pi_trend;
       pi.trend.pava[,j]=pi_trend_pava;
       pi.init.pava[,j]=pi_init_pava;
@@ -214,7 +214,7 @@ estim.mix=function(tab, tab.imp, conditions, x.min=20, x.max=30, x.step.mod=300,
       h=1;
       x=abs[h,j];
       Fmn=0;
-      while ((Fmn[length(Fmn)]<0.999)&(h<length(abs[,j]))){
+      while ((Fmn[length(Fmn)]<0.9)&(h<length(abs[,j]))){
         Fmn=c(Fmn,(1-pi_na[j]*pi_mcar[j])*F_na(x)/(1-pi_mcar[j])-(1-pi_na[j])*pi_mcar[j]*F_obs(x)/(1-pi_mcar[j]));
         h=h+1;
         x=abs[h,j];

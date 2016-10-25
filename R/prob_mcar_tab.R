@@ -10,3 +10,7 @@ prob.mcar.tab=function(tab.l,tab.u,res){
   }
   return(prob)
 }
+
+
+
+ 

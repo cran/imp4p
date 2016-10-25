@@ -1,7 +1,10 @@
 
 #Function to perform igcda algorithm for selected MNAR values and slsa algorithm or mle algorithm for MCAR values
 
-impute.mix <-function (tab, prob.MCAR, conditions, repbio, reptech, method="slsa", nknn=15, weight=1, selec="all", ind.comp=1, progress.bar=TRUE, q=0.95){
+impute.mix <-function (tab, prob.MCAR, conditions, repbio=NULL, reptech=NULL, method="slsa", nknn=15, weight=1, selec="all", ind.comp=1, progress.bar=TRUE, q=0.95){
+  
+  if (is.null(repbio)){repbio=as.factor(1:length(conditions));}
+  if (is.null(reptech)){reptech=as.factor(1:length(conditions));}
   
   tab.mvs=tab;
     
@@ -12,7 +15,7 @@ impute.mix <-function (tab, prob.MCAR, conditions, repbio, reptech, method="slsa
 
   #Impute MCAR values
   if (method=="slsa"){
-      tab.imp=impute.slsa(tab=tab.mvs, conditions=conditions, repbio=repbio, reptech=reptech, nknn=nknn, selec=selec, weight=weight, ind.comp=ind.comp, progress.bar=progress.bar);
+      tab.imp=impute.slsa(tab=tab.mvs, conditions=conditions, repbio=repbio, reptech=reptech, nknn=nknn, selec=min(selec,nrow(tab.mvs)), weight=weight, ind.comp=ind.comp, progress.bar=progress.bar);
   }else{
       nb_cond=length(levels(conditions));
       nb_rep=rep(0,nb_cond);

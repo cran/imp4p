@@ -13,8 +13,8 @@ impute.igcda <-function (tab, tab.imp, conditions, q=0.95){
     nb_rep[i]=sum((conditions==levels(conditions)[i]));
     dataSet.mvs=tab[,(k:(k+nb_rep[i]-1))];
 
-    mim=apply(dataSet.mvs,1,min,na.rm=TRUE);
-    mam=apply(dataSet.mvs,1,max,na.rm=TRUE);
+    mim=suppressWarnings(apply(dataSet.mvs,1,min,na.rm=TRUE));
+    mam=suppressWarnings(apply(dataSet.mvs,1,max,na.rm=TRUE));
     rmammim=mam-mim;
     rangem=quantile(rmammim,probs=q);
     mini=min(mim,na.rm=T);
@@ -24,7 +24,7 @@ impute.igcda <-function (tab, tab.imp, conditions, q=0.95){
       
       if (sum(is.na(curr.sample))!=0){
         Fobs=ecdf(curr.sample);
-        sta=Fobs(quantile(tab.imp[which(is.na(curr.sample)),j],0.9));
+        sta=Fobs(quantile(tab.imp[which(is.na(curr.sample)),j],0.9,na.rm=T));
         #
         gamma=sum(is.na(curr.sample))/length(curr.sample);
         interv=gamma+(1-gamma)*seq(sta,0.999,length.out=100);

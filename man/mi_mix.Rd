@@ -8,8 +8,8 @@ Multiple imputation from a matrix of probabilities of being MCAR for each missin
 This function allows imputing data sets with a multiple imputation strategy.
 }
 \usage{
-mi.mix(tab, tab.imp, prob.MCAR, conditions, repbio, reptech, nb.iter=10, nknn=15,
-weight=1, selec="all", ind.comp=1, methodi="slsa", q=0.95, progress.bar=TRUE)
+mi.mix(tab, tab.imp, prob.MCAR, conditions, repbio=NULL, reptech=NULL, nb.iter=3, nknn=15,
+weight=1, selec="all", siz=500, ind.comp=1, methodi="slsa", q=0.95, progress.bar=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -17,11 +17,12 @@ weight=1, selec="all", ind.comp=1, methodi="slsa", q=0.95, progress.bar=TRUE)
   \item{tab.imp}{A matrix where the missing values of \code{tab} have been imputed under the assumption that they are all MCAR. For instance, such a matrix can be obtained from the function \code{\link{impute.slsa}} of this package.}
   \item{prob.MCAR}{A matrix of probabilities that each missing value is MCAR. For instance such a matrix can be obtained from the function \code{\link{prob.mcar.tab}} of this package.}
   \item{conditions}{A vector of factors indicating the biological condition to which each column (experimental sample) belongs.}
-  \item{repbio}{A vector of factors indicating the biological replicate to which each column belongs.}
-  \item{reptech}{A vector of factors indicating the technical replicate to which each column belongs.}
+  \item{repbio}{A vector of factors indicating the biological replicate to which each column belongs. Default is NULL (no experimental design is considered).}
+  \item{reptech}{A vector of factors indicating the technical replicate to which each column belongs. Default is NULL (no experimental design is considered).}
   \item{nb.iter}{The number of iterations used for the multiple imputation method.}
   \item{nknn}{The number of nearest neighbours used in the SLSA algorithm (see \code{\link{impute.slsa}}).}
   \item{selec}{A parameter to select a part of the dataset to find nearest neighbours between rows. This can be useful for big data sets (see \code{\link{impute.slsa}}).}
+  \item{siz}{A parameter to select a part of the dataset to perform imputations with the SLSA or the MLE algorithm. This can be useful for big data sets. Note that \code{siz} needs to be inferior to \code{selec}.} 
   \item{weight}{The way of weighting in the algorithm (see \code{\link{impute.slsa}}).}
   \item{ind.comp}{If \code{ind.comp=1}, only nearest neighbours without missing values are selected to fit linear models (see \code{\link{impute.slsa}}). Else, they can contain missing values.}
   \item{methodi}{The method used for imputing data. If \code{methodi="mle"}, then the MLE algorithm is used (function \code{impute.wrapper.MLE} of the R package imputeLCMD), else the SLSA algorithm is used (default).}
@@ -55,25 +56,19 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
-#Deleting rows without any observed value in a condition
-result=delete.na.rows(tab=res.sim$dat.obs, tab.c=res.sim$dat.comp, conditions=res.sim$conditions,
-list.MCAR=res.sim$list.MCAR);
-
-#Imputation of missing values with the slsa algorithm
-dat.slsa=impute.slsa(result$tab.mod,conditions=res.sim$condition,repbio=res.sim$repbio,
-reptech=as.factor(1:length(res.sim$condition)));
+#Fast imputation of missing values with the impute.rand algorithm
+dat.rand=impute.rand(tab=res.sim$dat.obs,conditions=res.sim$condition);
 
 #Estimation of the mixture model
-res=estim.mix(tab=result$tab.mod, tab.imp=dat.slsa, conditions=res.sim$condition);
+res=estim.mix(tab=res.sim$dat.obs, tab.imp=dat.rand, conditions=res.sim$condition);
 
 #Computing probabilities to be MCAR
-born=estim.bound(tab=result$tab.mod,conditions=res.sim$condition);
+born=estim.bound(tab=res.sim$dat.obs,conditions=res.sim$condition);
 proba=prob.mcar.tab(born$tab.lower,born$tab.upper,res);
 
-#Multiple imputation strategy with 5 iterations (can be time consuming!)
-data.mi=mi.mix(tab=result$tab.mod, tab.imp=dat.slsa, prob.MCAR=proba, conditions=
-res.sim$conditions, repbio=res.sim$repbio, reptech=as.factor(1:length(res.sim$condition)),
-nb.iter=5);
+#Multiple imputation strategy with 3 iterations (can be time consuming in function of the data set!)
+data.mi=mi.mix(tab=res.sim$dat.obs, tab.imp=dat.rand, prob.MCAR=proba, conditions=
+res.sim$conditions, repbio=res.sim$repbio, nb.iter=3);
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

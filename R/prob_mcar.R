@@ -4,10 +4,14 @@
 prob.mcar=function(b.l,b.u,absc,pi.mcar,F.tot,F.na){
   prob=rep(0,length(b.l));
   for (i in 1:length(b.l)){
+    
+      if (!is.na(b.l[i])){  
+      if (!is.na(b.u[i])){
       if (!is.nan(b.l[i])){
       if (!is.nan(b.u[i])){  
       if (b.l[i]!=Inf){  
       if (b.u[i]!=Inf){
+
         
         i.binf=which.min(abs(absc-b.l[i]));
         i.bsup=which.min(abs(absc-b.u[i]));
@@ -22,11 +26,14 @@ prob.mcar=function(b.l,b.u,absc,pi.mcar,F.tot,F.na){
           }
           prob[i]=pi.mcar*(F.tot[i.bsup]-F.tot[i.binf])/(F.na[i.bsup]-F.na[i.binf]);
         }
-      
+        
       }
       }
       }
       }
+      }
+      }
+
   }
   
   prob[prob>1]=1;

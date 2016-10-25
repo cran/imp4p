@@ -28,6 +28,8 @@ estim.bound=function(tab,conditions,q=0.95){
     
     k=k+nb_rep[n];
   }
+  lb[lb==0]=NA;
+  ub[ub==0]=NA;
   
   return(list(tab.lower=lb,tab.upper=ub));
 }

@@ -5,16 +5,31 @@
 #between the min of observed values in the column 
 #and the q% quantile of these observed values. 
 
-impute.pa=function(tab, q=0.01){
+impute.pa=function(tab, conditions, q.min=0, q.norm=3, eps=2){
   
   tab_imp=tab;
   
-  qu=apply(tab_imp,2,quantile,na.rm=T,q);
-  mi=apply(tab_imp,2,min,na.rm=T);
+  qu=apply(tab_imp,2,quantile,na.rm=T,q.min);
   
-  for (j in 1:ncol(tab)){
-      tab_imp[which(is.na(tab_imp[,j])),j]=runif(n=sum(is.na(tab_imp[,j])),min=mi[j],max=qu[j]);
+  nb_cond=length(levels(conditions));
+  nb_rep=rep(0,nb_cond);
+  k=1;
+  j=1;
+  for (i in 1:nb_cond){
+    
+    nb_rep[i]=sum((conditions==levels(conditions)[i]));
+    sde=apply(tab_imp[,(k:(k+nb_rep[i]-1))],1,sd,na.rm=T);
+    
+    while (j<(k+nb_rep[i])){
+      tab_imp[which(is.na(tab_imp[,j])),j]=runif(n=sum(is.na(tab_imp[,j])),min=qu[j]-eps-q.norm*median(sde,na.rm=T),max=qu[j]-eps);
+      j=j+1;
+    }
+    
+    k=k+nb_rep[i];
   }
   
   return(tab_imp);
 }
+
+
+ 
