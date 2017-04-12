@@ -8,7 +8,7 @@ Imputing missing values using an adaptation of the LSimpute algorithm (Bo et al.
 This function is an adaptation of the LSimpute algorithm (Bo et al. (2004)) to experimental designs usually met in MS-based quantitative proteomics.
 }
 \usage{
-impute.slsa(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec="all", weight=1, 
+impute.slsa(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec="all", weight=1,
 ind.comp=1, progress.bar=TRUE)
   }
 %- maybe also 'usage' for other objects documented here.
@@ -33,7 +33,7 @@ For big data sets, this step can be time consuming and that is why the input par
 
 Once similarity measures are computed for a specific row, then the \code{nknn} rows with the highest similarity measures are considered to fit linear models and to predict several estimates for each missing value (see Bo et al. (2004)). If \code{ind.comp=1}, then only nearest neighbours without missing values in the condition are considered. However, unlike the original algorithm, our algorithm allows to consider the design of experiments that are specified in input through the vectors \code{conditions}, \code{repbio} and \code{reptech}. Note that \code{conditions} has to get a lower number of levels than \code{repbio}; and  \code{repbio} has to get a lower number of levels than \code{reptech}.
 
-In the original algorithm, several predictions of each missing value are done from the estimated linear models and, then, they are weighted in function of their similarity measure and summed (see Bo et al. (2004)). In our algorithm, one can use the original weighting function of Bo et al. (2004) if \code{weight="o"}, i.e. \code{(sim^2/(1-sim^2+1e-06))^2} where \code{sim} is the similarity measure; or the weighting function \code{sim^weight} if \code{weight} is a numeric value. 
+In the original algorithm, several predictions of each missing value are done from the estimated linear models and, then, they are weighted in function of their similarity measure and summed (see Bo et al. (2004)). In our algorithm, one can use the original weighting function of Bo et al. (2004) if \code{weight="o"}, i.e. \code{(sim^2/(1-sim^2+1e-06))^2} where \code{sim} is the similarity measure; or the weighting function \code{sim^weight} if \code{weight} is a numeric value.
 }
 \value{
 The input matrix \code{tab} with imputed values instead of missing values.
@@ -56,7 +56,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Imputation of missing values with the slsa algorithm

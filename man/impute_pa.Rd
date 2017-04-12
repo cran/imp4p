@@ -5,7 +5,7 @@
 Imputation of peptides having no value in a biological condition (present in a condition / absent in another).
 }
 \description{
-This function imputes missing values by small values. 
+This function imputes missing values by small values.
 }
 \usage{
 impute.pa(tab, conditions, q.min=0, q.norm=3, eps=2)
@@ -42,7 +42,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Imputation of the simulated data set with small values

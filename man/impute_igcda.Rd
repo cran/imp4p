@@ -8,7 +8,7 @@ Imputing missing values by assuming that the distribution of complete values is 
 This function allows imputing missing values under the assumption that the distribution of complete values has to be Gaussian in each column.
 }
 \usage{
-impute.igcda(tab, tab.imp, conditions, q=0.95) 
+impute.igcda(tab, tab.imp, conditions, q=0.95)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,7 +23,7 @@ The mean and variance of the Gaussian distribution are determined using a linear
 The quantile value is used for determining the minimum of imputed values. This minimum is determined by the minimum observed value in the dataset minus \code{quant_diff(q)} where \code{quant_diff(q)} corresponds to a quantile value of the differences between the maximum and the minimum of the observed values for all the peptides in the condition. As a result, if \code{q} is close to 1, \code{quant_diff(q)} represents an extrem value between the maximum and the minimum of the intensity values in a condition for a peptide.
 }
 \value{
-The numeric input matrix with imputed values. The distribution of the intensity values in each of its columns is supposed to be Gaussian. 
+The numeric input matrix with imputed values. The distribution of the intensity values in each of its columns is supposed to be Gaussian.
 }
 %\references{
 %% ~put references to the literature/web site here ~
@@ -43,7 +43,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Imputation of missing values with the slsa algorithm

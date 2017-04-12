@@ -1,7 +1,7 @@
 
 #impute the data to get a gaussian distribution in each column
 
-impute.igcda <-function (tab, tab.imp, conditions, q=0.95){
+impute.igcda=function (tab, tab.imp, conditions, q=0.95){
   
   dataSet.imputed=tab;
   nb_cond=length(levels(conditions));
@@ -12,7 +12,7 @@ impute.igcda <-function (tab, tab.imp, conditions, q=0.95){
     #Number of replicates in each condition
     nb_rep[i]=sum((conditions==levels(conditions)[i]));
     dataSet.mvs=tab[,(k:(k+nb_rep[i]-1))];
-
+    
     mim=suppressWarnings(apply(dataSet.mvs,1,min,na.rm=TRUE));
     mam=suppressWarnings(apply(dataSet.mvs,1,max,na.rm=TRUE));
     rmammim=mam-mim;
@@ -36,7 +36,8 @@ impute.igcda <-function (tab, tab.imp, conditions, q=0.95){
         v = (as.numeric(temp.QR$coefficients[2]))^2;
         
         #Computation of missing value density
-        dx=seq(max(c(0,mini-rangem)),max(curr.sample,na.rm=T),length.out=1e3);
+        #dx=seq(max(c(0,mini-rangem)),max(curr.sample,na.rm=T),length.out=1e3);
+        dx=seq(mini-rangem,max(curr.sample,na.rm=T),length.out=1e3);
         Fn=pnorm(dx,mean=m,sd=sqrt(v));
         Fna=(Fn-(1-gamma)*Fobs(dx))/gamma;
         Fna[Fna>1]=1;
@@ -64,8 +65,3 @@ impute.igcda <-function (tab, tab.imp, conditions, q=0.95){
   
   return(dataSet.imputed)
 }
-
-
-
-
-

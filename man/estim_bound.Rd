@@ -1,7 +1,7 @@
 \name{estim.bound}
 \alias{estim.bound}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ 
+\title{
 Estimation of lower and upper bounds for missing values.
 }
 \description{
@@ -28,7 +28,7 @@ where \code{quant_diff(q)} corresponds to a quantile value of the differences be
 \value{
 A list composed of:
   \item{tab.lower}{A matrix with the lower bounds for each missing value in \code{tab}.}
-  \item{tab.upper}{A matrix with the upper bounds for each missing value in \code{tab}.} 
+  \item{tab.upper}{A matrix with the upper bounds for each missing value in \code{tab}.}
 }
 %\references{
 %% ~put references to the literature/web site here ~
@@ -48,14 +48,14 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 data=res.sim$dat.obs;
 cond=res.sim$conditions;
 
 #Estimation of lower and upper bounds for each missing value
-res=estim.bound(data,conditions=cond);  
+res=estim.bound(data,conditions=cond);
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

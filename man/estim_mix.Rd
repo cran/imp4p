@@ -1,23 +1,21 @@
 \name{estim.mix}
 \alias{estim.mix}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ 
+\title{
 Estimation of a mixture model of MCAR and MNAR values in each column of a data matrix.
 }
 \description{
 This function allows estimating a mixture model of MCAR and MNAR values in each column of data sets similar to the ones which can be studied in MS-based quantitative proteomics. Such data matrices contain intensity values of identified peptides.
 }
 \usage{
-estim.mix(tab, tab.imp, conditions, x.min=20, x.max=30, x.step.mod=300, 
-x.step.pi=300, nb.rei=100, method=3, gridsize=300)
+estim.mix(tab, tab.imp, conditions, x.step.mod=300,
+x.step.pi=300, nb.rei=100, method=1, gridsize=300)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tab}{A data matrix containing numeric and missing values. Each column of this matrix is assumed to correspond to an experimental sample, and each row to an identified peptide.}
   \item{tab.imp}{A matrix where the missing values of \code{tab} have been imputed under the assumption that they are all MCAR. For instance, such a matrix can be obtained by using the function \code{\link{impute.slsa}} of this package.}
   \item{conditions}{A vector of factors indicating the biological condition to which each column (experimental sample) belongs.}
-  \item{x.min}{The lower bound of the interval used for estimating the cumulative distribution functions of the mixing model in each column.}
-  \item{x.max}{The upper bound of the interval used for estimating the cumulative distribution functions of the mixing model in each column.}
   \item{x.step.mod}{The number of points in the intervals used for estimating the cumulative distribution functions of the mixing model in each column.}
   \item{x.step.pi}{The number of points in the intervals used for estimating the proportion of MCAR values in each column.}
   \item{nb.rei}{The number of initializations of the minimization algorithm used to estimate the proportion of MCAR values (see Details).}
@@ -31,15 +29,15 @@ This function aims to estimate the following mixture model in each column:
 
 \eqn{F_{na}(x)=\pi_{mcar}\times F_{tot}(x)+(1-\pi_{mcar})\times F_{mnar}(x)}
 
-where \eqn{\pi_{na}} is the proportion of missing values, \eqn{\pi_{mcar}} is the proportion of MCAR values, \eqn{F_{tot}} is the cumulative distribution function (cdf) of the complete values, \eqn{F_{na}} is the cdf of the missing values, \eqn{F_{obs}} is the cdf of the observed values, and \eqn{F_{mnar}} is the cdf of the MNAR values. 
+where \eqn{\pi_{na}} is the proportion of missing values, \eqn{\pi_{mcar}} is the proportion of MCAR values, \eqn{F_{tot}} is the cumulative distribution function (cdf) of the complete values, \eqn{F_{na}} is the cdf of the missing values, \eqn{F_{obs}} is the cdf of the observed values, and \eqn{F_{mnar}} is the cdf of the MNAR values.
 
-To estimate this model, a first step consists to compute a rough estimate of \eqn{F_{na}}  by assuming that all missing values are MCAR (thanks to the argument \code{tab.imp}). This rough estimate is noted \eqn{\hat{F}_{na}}. 
+To estimate this model, a first step consists to compute a rough estimate of \eqn{F_{na}}  by assuming that all missing values are MCAR (thanks to the argument \code{tab.imp}). This rough estimate is noted \eqn{\hat{F}_{na}}.
 
 In a second step, the proportion of MCAR values is estimated. To do so, the ratio
 
-\eqn{\hat{\pi}(x)=(1-\hat{F}_{na}(x))/(1-\hat{F}_{tot}(x))} 
+\eqn{\hat{\pi}(x)=(1-\hat{F}_{na}(x))/(1-\hat{F}_{tot}(x))}
 
-is computed for different \eqn{x}, where 
+is computed for different \eqn{x}, where
 
 \eqn{\hat{F}_{tot}(x)=\pi_{na}\times \hat{F}_{na}(x)+(1-\pi_{na})\times \hat{F}_{obs}(x)}
 
@@ -47,45 +45,45 @@ with \eqn{\hat{F}_{obs}} the empirical cdf of the observed values.
 
 Next, the following minimization is performed:
 
-\eqn{\min_{1>k>0,a>0,d>0}f(k,a,d)} 
+\eqn{\min_{1>k>0,a>0,d>0}f(k,a,d)}
 
 where
 
 \eqn{f(k,a,d)=\sum_x \frac{1}{s(x)^2}\times [\hat{\pi}(x)-k-(1-k)\frac{\exp(-a\times [x-lower_x]^d)}{1-\hat{F}_{tot}(x)}]^2}
 
-where \eqn{s(x)^2} is an estimate of the asymptotic variance of \eqn{\hat{\pi}(x)}, \eqn{lower_x} is an estimate of the minimum of the complete values. To perform this minimization, the function \code{optim} with the method "L-BFGS-B" is used. Because it is function of its initialization, it is possible to reinitialize a number of times the minimisation algorithm with the argument \code{nb.rei}: the parameters leading to the lowest minimum are next kept. 
+where \eqn{s(x)^2} is an estimate of the asymptotic variance of \eqn{\hat{\pi}(x)}, \eqn{lower_x} is an estimate of the minimum of the complete values. To perform this minimization, the function \code{optim} with the method "L-BFGS-B" is used. Because it is function of its initialization, it is possible to reinitialize a number of times the minimisation algorithm with the argument \code{nb.rei}: the parameters leading to the lowest minimum are next kept.
 
-Once \code{k}, \code{a} and \code{d} are estimated, one can use several methods to estimate \eqn{\pi_{mcar}}: it is estimated 
+Once \code{k}, \code{a} and \code{d} are estimated, one can use several methods to estimate \eqn{\pi_{mcar}}: it is estimated
 
-by \eqn{k} if \code{method=1}; 
+by \eqn{k} if \code{method=1} (default);
 
-by \eqn{k+(1-k)\times\exp(-a\times [\max(x)-lower_x]^d)/(1-\hat{F}_{tot}(\max(x)))} 
+by \eqn{k+(1-k)\times\exp(-a\times [\max(x)-lower_x]^d)/(1-\hat{F}_{tot}(\max(x)))}
 
-if \code{method=2}; 
+if \code{method=2};
 
-by estimating a decreasing trend with the Pool-Adjacent-Violators (PAV) algorithm on 
+by estimating a decreasing trend with the Pool-Adjacent-Violators (PAV) algorithm on
 
-\eqn{k+(1-k)\times\exp(-a\times [x-lower_x]^d)/(1-\hat{F}_{tot}(x))} 
+\eqn{k+(1-k)\times\exp(-a\times [x-lower_x]^d)/(1-\hat{F}_{tot}(x))}
 
-and keeping the righmost value of this trend if \code{method=3}; 
+and keeping the righmost value of this trend if \code{method=3};
 
-by estimating a decreasing trend with the PAV algorithm on \eqn{\hat{\pi}(x)} and keeping the righmost value of this trend if \code{method=4}; 
+by estimating a decreasing trend with the PAV algorithm on \eqn{\hat{\pi}(x)} and keeping the righmost value of this trend if \code{method=4};
 
-by using the histogram of \eqn{\hat{\pi}(x)} if \code{method=5}; 
+by using the histogram of \eqn{\hat{\pi}(x)} if \code{method=5};
 
-by using the method of Patra and Sen (2015) adapted to our problematic if \code{method=6}. 
+by using the method of Patra and Sen (2015) adapted to our problematic if \code{method=6}.
 }
 \value{
 A list composed of:
-  \item{abs.pi}{A numeric matrix containing the intervals used for estimating the ratio 
-  
-  \code{(1-F_na(x))/(1-F_tot(x))} 
-  
+  \item{abs.pi}{A numeric matrix containing the intervals used for estimating the ratio
+
+  \code{(1-F_na(x))/(1-F_tot(x))}
+
   in each column.}
-  \item{pi.init}{A numeric matrix containing the estimated ratios 
-  
-  \code{(1-F_na(x))/(1-F_tot(x))} 
-  
+  \item{pi.init}{A numeric matrix containing the estimated ratios
+
+  \code{(1-F_na(x))/(1-F_tot(x))}
+
   where \code{x} belongs to \code{abs.pi[,j]} for each sample \code{j}.}
   \item{var.pi.init}{A numeric matrix containing the estimated asymptotic variances of \code{pi.init}.}
   \item{abs.mod}{A numeric vector containing the interval used for estimating the mixture models in each column.}
@@ -114,7 +112,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Imputation of missing values with the slsa algorithm

@@ -5,7 +5,7 @@
 Imputation of peptides with a random value.
 }
 \description{
-For each row (peptide), this function imputes missing values by random values following a Gaussian distribution. 
+For each row (peptide), this function imputes missing values by random values following a Gaussian distribution.
 }
 \usage{
 impute.rand(tab, conditions)
@@ -16,7 +16,7 @@ impute.rand(tab, conditions)
   \item{conditions}{A vector of factors indicating the biological condition to which each column (experimental sample) belongs.}
   }
 \details{
-For each row (peptide), this function imputes missing values by random values following a Gaussian distribution centered on the mean of the observed values in the condition and with a standard deviation equal to the first quartile of the distribution of the standard deviation the values observed for all the peptides. Rows with only missing values in a condition are not imputed (the \code{\link{impute.pa}} function can be used for this purpose). 
+For each row (peptide), this function imputes missing values by random values following a Gaussian distribution centered on the mean of the observed values in the condition and with a standard deviation equal to the first quartile of the distribution of the standard deviation the values observed for all the peptides. Rows with only missing values in a condition are not imputed (the \code{\link{impute.pa}} function can be used for this purpose).
 }
 \value{
 The input matrix \code{tab} with imputed values instead of missing values.
@@ -39,7 +39,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Imputation of the simulated data set with small values

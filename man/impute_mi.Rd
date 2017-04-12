@@ -8,9 +8,9 @@ Imputation of data sets containing peptide intensities with a multiple imputatio
 This function allows imputing data sets containing peptide intensities with a multiple imputation strategy.
 }
 \usage{
-impute.mi(tab, conditions, repbio=NULL, reptech=NULL, nb.iter=3, nknn=15, selec=600, 
-siz=500, weight=1, ind.comp=1, progress.bar=TRUE, x.min=20, x.max=30, x.step.mod=300, 
-x.step.pi=300, nb.rei=100, method=4, gridsize=300, q=0.95, q.min=0, q.norm=3, 
+impute.mi(tab, conditions, repbio=NULL, reptech=NULL, nb.iter=3, nknn=15, selec=1000,
+siz=900, weight=1, ind.comp=1, progress.bar=TRUE, x.step.mod=300,
+x.step.pi=300, nb.rei=100, method=1, gridsize=300, q=0.95, q.min=0, q.norm=3,
 eps=2, methodi="slsa");
 }
 %- maybe also 'usage' for other objects documented here.
@@ -27,8 +27,6 @@ eps=2, methodi="slsa");
   \item{weight}{The way of weighting in the algorithm (see \code{\link{impute.slsa}}).}
   \item{ind.comp}{If \code{ind.comp=1}, only nearest neighbours without missing values are selected to fit linear models (see \code{\link{impute.slsa}}). Else, they can contain missing values.}
   \item{progress.bar}{If \code{TRUE}, a progress bar is displayed.}
-  \item{x.min}{The lower bound of the interval used for estimating the cumulative distribution functions of the mixing model in each column (see \code{\link{estim.mix}}).}
-  \item{x.max}{The upper bound of the interval used for estimating the cumulative distribution functions of the mixing model in each column (see \code{\link{estim.mix}}).}
   \item{x.step.mod}{The number of points in the intervals used for estimating the cumulative distribution functions of the mixing model in each column (see \code{\link{estim.mix}}).}
   \item{x.step.pi}{The number of points in the intervals used for estimating the proportion of MCAR values in each column (see \code{\link{estim.mix}}).}
   \item{nb.rei}{The number of initializations of the minimization algorithm used to estimate the proportion of MCAR values (see Details) (see \code{\link{estim.mix}}).}
@@ -63,22 +61,22 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Imputation of the dataset noting the conditions to which the samples belong.
 result=impute.mi(tab=res.sim$dat.obs, conditions=res.sim$conditions);
 
-#Imputation of the dataset noting the conditions to which the samples belong 
+#Imputation of the dataset noting the conditions to which the samples belong
 #and also their biological replicates.
 result=impute.mi(tab=res.sim$dat.obs, conditions=res.sim$conditions, repbio=res.sim$repbio);
 
-#For large data sets, the imputation can be accelerated thanks to the selec parameter 
+#For large data sets, the imputation can be accelerated thanks to the selec parameter
 #and the siz parameter (see impute.slsa and mi.mix)
 #but it may result in a less accurate data imputation. Note that selec has to be greater than siz.
 #
 #Here, nb.iter is fixed to 3
-result1=impute.mi(tab=res.sim$dat.obs, conditions=res.sim$conditions, progress.bar=TRUE, 
+result1=impute.mi(tab=res.sim$dat.obs, conditions=res.sim$conditions, progress.bar=TRUE,
 selec=400, siz=300, nb.iter=3);
 }
 }

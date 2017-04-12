@@ -1,4 +1,6 @@
 exportPattern("^[[:alpha:]]+")
+importFrom(Rcpp, evalCpp)
+useDynLib(imp4p)
 importFrom(Iso,pava)
 importFrom(truncnorm,rtruncnorm)
 importFrom(stats,lm.fit,ecdf,coefficients,quantile,runif,pnorm,dbeta,sd,rnorm,optim,qnorm,cor,lm,density, median)

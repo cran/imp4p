@@ -22,7 +22,7 @@ weight=1, selec="all", siz=500, ind.comp=1, methodi="slsa", q=0.95, progress.bar
   \item{nb.iter}{The number of iterations used for the multiple imputation method.}
   \item{nknn}{The number of nearest neighbours used in the SLSA algorithm (see \code{\link{impute.slsa}}).}
   \item{selec}{A parameter to select a part of the dataset to find nearest neighbours between rows. This can be useful for big data sets (see \code{\link{impute.slsa}}).}
-  \item{siz}{A parameter to select a part of the dataset to perform imputations with the SLSA or the MLE algorithm. This can be useful for big data sets. Note that \code{siz} needs to be inferior to \code{selec}.} 
+  \item{siz}{A parameter to select a part of the dataset to perform imputations with the SLSA or the MLE algorithm. This can be useful for big data sets. Note that \code{siz} needs to be inferior to \code{selec}.}
   \item{weight}{The way of weighting in the algorithm (see \code{\link{impute.slsa}}).}
   \item{ind.comp}{If \code{ind.comp=1}, only nearest neighbours without missing values are selected to fit linear models (see \code{\link{impute.slsa}}). Else, they can contain missing values.}
   \item{methodi}{The method used for imputing data. If \code{methodi="mle"}, then the MLE algorithm is used (function \code{impute.wrapper.MLE} of the R package imputeLCMD), else the SLSA algorithm is used (default).}
@@ -53,7 +53,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Fast imputation of missing values with the impute.rand algorithm

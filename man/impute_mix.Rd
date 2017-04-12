@@ -2,15 +2,15 @@
 \alias{impute.mix}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Imputation using a decision rule under an assumption of a mixture of MCAR and MNAR values. 
+Imputation using a decision rule under an assumption of a mixture of MCAR and MNAR values.
 }
 \description{
-This function allows imputing data sets with a MCAR-devoted algorithm and a MNAR-devoted algorithm using probabilities that missing values are MCAR. If such a probability is superior to 0.5, then the MCAR-devoted algorithm is used, otherwise it is the MNAR-devoted algorithm. 
+This function allows imputing data sets with a MCAR-devoted algorithm and a MNAR-devoted algorithm using probabilities that missing values are MCAR. If such a probability is superior to 0.5, then the MCAR-devoted algorithm is used, otherwise it is the MNAR-devoted algorithm.
 }
 \usage{
 impute.mix(tab, prob.MCAR, conditions, repbio=NULL, reptech=NULL, method="slsa", nknn=15,
 weight=1, selec="all", ind.comp=1, progress.bar=TRUE, q=0.95)
- 
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -28,7 +28,7 @@ weight=1, selec="all", ind.comp=1, progress.bar=TRUE, q=0.95)
     \item{q}{A quantile value (see \code{\link{impute.igcda}}).}
 }
 \details{
-The missing values for which \code{prob.MCAR} is superior to 0.5 are imputed with either the function \code{\link{impute.slsa}} or the MLE algorithm (function \code{impute.wrapper.MLE} of the R package imputeLCMD). The other missing values are considered MNAR and imputed with \code{\link{impute.igcda}}. 
+The missing values for which \code{prob.MCAR} is superior to 0.5 are imputed with either the function \code{\link{impute.slsa}} or the MLE algorithm (function \code{impute.wrapper.MLE} of the R package imputeLCMD). The other missing values are considered MNAR and imputed with \code{\link{impute.igcda}}.
 }
 \value{
 The input matrix \code{tab} with imputed values instead of missing values.
@@ -51,7 +51,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=10,nb.cond=2,nb.repbio=3,
+res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
 nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
 
 #Fast imputation of missing values with the impute.rand algorithm
@@ -66,7 +66,7 @@ proba=prob.mcar.tab(born$tab.lower,born$tab.upper,res);
 
 #Imputation under the assumption of MCAR and MNAR values
 tabi=impute.mix(tab=res.sim$dat.obs, prob.MCAR=proba, conditions=res.sim$conditions,
-repbio=res.sim$repbio, method="slsa", nknn=15, weight=1, selec="all", ind.comp=1, 
+repbio=res.sim$repbio, method="slsa", nknn=15, weight=1, selec="all", ind.comp=1,
 progress.bar=TRUE);
 }
 }
