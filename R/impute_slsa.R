@@ -39,6 +39,7 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
       if (progress.bar==TRUE){
         if (roww[1]%/%(floor(0.1*nrow(xincomplete1)))==roww[1]/(floor(0.1*nrow(xincomplete1)))){cat(c(0.1*(roww[1]%/%(floor(0.1*nrow(xincomplete1))))*100,"% - "));}
       }
+      #print(roww[1])
       roww=roww[2:length(roww)];
       naroww=is.na(roww);
       # if at least one missing value else no imputation of the row
@@ -67,6 +68,7 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
           #At least nknn observed values are needed in each column of row.cand and row.impcand
           Kmin=0;
           kl=1;
+          ind.comp.temp=ind.comp
           while (Kmin<(nknn)){
             kl=kl+1;
             row.idx=osim[2:(kl+1)];
@@ -75,7 +77,7 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
             row.cand=cand_x[row.idx, , drop=F];
             indcand=fast_apply_nb_na(row.cand,1);
             indic=which(indcand!=length(row.cand[1,]));
-            if (ind.comp==1){indic=which(indcand==0);}
+            if (ind.comp.temp==1){indic=which(indcand==0);}
             row.idx=row.idx[indic];
             row.r=row.r[indic];
 
@@ -88,9 +90,14 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
             }else{nborc=sum(!is.na(row.cand));}
             nboric=fast_apply_nb_not_na(row.impcand,2);
             Kmin=min(c(nborc,nboric));
-
-            if (kl>=500){kl=1;ind.comp=0;}
+            if (ind.comp.temp==1){
+              if (kl>=700){
+                    kl=1;ind.comp.temp=0;
+              }
+              #if (ind.comp==0){Kmin=nknn;}
+            }
           }
+
           #Let's go to fit linear models and responses
           #1) creating design matrices
           rrepb=as.factor(as.numeric(repb[-row.exp]));

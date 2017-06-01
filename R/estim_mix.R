@@ -6,7 +6,7 @@
 ####################################
 
 
-estim.mix=function(tab, tab.imp, conditions, x.step.mod=300, x.step.pi=300, nb.rei=100, method=1, gridsize=300){
+estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.rei=50, method=1, gridsize=100){
 
   #require(Iso);
   min.x=min(tab.imp,na.rm=TRUE);
@@ -92,23 +92,39 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=300, x.step.pi=300, nb.r
       #Determination of the interval on which is estimated pi^MLE(x)
       #F_na(x)>0 et F_obs(x)>0
       xmin=max(sort(v_na,na.last=T)[1],sort(tab2[which(!is.na(tab2[,j])),j],na.last=T)[1]);
-      #print(xmin)
       #F_na(x)<1 et F_obs(x)<1
       xmax=min(-sort(-v_na,na.last=T)[2],-sort(-tab2[which(!is.na(tab2[,j])),j],na.last=T)[2]);
-      #print(xmax)
       absi[,j]=seq(xmin,xmax,length.out=x.step.pi)
       pi_init=NULL;
       for (x in absi[,j]){
         #Initial estimator of the proportion (1-F_na(x))/(1-F(x))
-        pi_init_x=(1-F_na(x))/(1-(pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x)))
-        pi_init=c(pi_init,pi_init_x)
+        if (((pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x))!=1)){
+            pi_init_x=(1-F_na(x))/(1-(pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x)));
+        }else{
+            pi_init_x=(1-F_na(x))/(1-(1-1e-10));
+        }
+        pi_init=c(pi_init,pi_init_x);
       }
       kx=1
       while (pi_init[kx]>=1){
         kx=kx+1;
       }
       xmin=absi[kx,j];
-
+      kx=1;
+      while ((kx<length(pi_init))&(pi_init[kx]>=(max(pi_init,na.rm=TRUE)-min(pi_init,na.rm=TRUE))/2)){
+        kx=kx+1;
+      }
+      xmean=absi[kx,j];
+      if(xmin>(xmean-(xmax-xmean))){
+        xmin=(xmean-(xmax-xmean));
+        absi[,j]=seq(xmin,xmax,length.out=x.step.pi)
+        pi_init=NULL;
+        for (x in absi[,j]){
+          #Initial estimator of the proportion (1-F_na(x))/(1-F(x))
+          pi_init_x=(1-F_na(x))/(1-(pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x)))
+          pi_init=c(pi_init,pi_init_x)
+        }
+      }
       abs[,j]=seq(xmin,xmax,length.out=x.step.pi)
 
       ############
@@ -127,9 +143,10 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=300, x.step.pi=300, nb.r
       for (x in abs[,j]){
         ############
         #Initial estimator of the proportion (1-F_na(x))/(1-F(x))
-        pi_init_x=(1-F_na(x))/(1-(pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x)))
-        pi_init=c(pi_init,pi_init_x)
-
+        pi_init_x=(1-F_na(x))/(1-(pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x)));
+        pi_init=c(pi_init,pi_init_x);
+        pi_init[pi_init>=1]=1;
+        if (pi_init_x>=1){pi_init_x=1;}
         ############
         #Estimation of the cdfs
         F_na1=c(F_na1,F_na(x))
@@ -139,20 +156,23 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=300, x.step.pi=300, nb.r
         ############
         #Estimation of the asymptotic variance of the estimator
         del=(pi_na[j]-1)*pi_init_x/(pi_na[j]*pi_init_x-1)
-        mm=(1-del*(1-F_obs(x)))/(pi_init_x*((1-F_obs(x))*(pi_na[j]-1)-pi_na[j])+1)^2
-        a=pi_na[j]
+
         p=(1-F_obs(x))
+        if(p==1){p=1-1e-10;}
+
+        mm=(1-del*(1-F_obs(x)))/(pi_init_x*(p*(pi_na[j]-1)-pi_na[j])+1)^2
+        a=pi_na[j]
+
         I22=del*p*(1-del*p)*((1/pi_init_x+p*(1-a)/(a*(p-1)*pi_init_x-p*pi_init_x+1))^2)/(1-a*pi_init_x)^2
         I11=(1/a-1)/(p*(1-p))+del*p*(1-del*p)*((1/p-pi_init_x*(1-a)/(a*(p-1)*pi_init_x-p*pi_init_x+1))^2)
         I12=(1-pi_na[j])*mm
         I=matrix(c(I11,I12,I12,I22),2,2)
         v=solve(I)[2,2]
         varasy=c(varasy,((1-pi_na[j])/pi_na[j])*v)
-      }
 
-      varasy[varasy<0]=1e-10;
-      #varasy=1+(varasy-min(varasy))/(max(varasy)-min(varasy))
-      #varasy=rep(1,length(varasy));
+      }
+      varasy=varasy/length(tab2[which(!is.na(tab2[,j])),j])
+      varasy[varasy<(0.005^2)]=(0.005^2);
       PI_INIT[,j]=pi_init;
       VAR_PI_INIT[,j]=varasy;
 
@@ -161,10 +181,14 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=300, x.step.pi=300, nb.r
       pim=matrix(0,nb.rei,4)
       for (nbit in 1:nb.rei){
         init=c(runif(1,0,0.5),runif(1,1,50),runif(1,1,10))
-        #while (!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=rep(0,3), upper=c(1,Inf,Inf), method="L-BFGS-B", w=1/varasy, Ft=F_tot1), TRUE), "try-error")==FALSE){
-        while (!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(0.01,0.0005,2), upper=c(0.5,0.01,5), method="L-BFGS-B", w=1/varasy, Ft=F_tot1), TRUE), "try-error")==FALSE){
+        nbtest=1;
+        #while (!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=rep(0,0,3), upper=c(1,Inf,Inf), method="L-BFGS-B", w=1/varasy, Ft=F_tot1), TRUE), "try-error")==FALSE){
+        while ((!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(0.01,0.0005,2), upper=c(0.5,0.01,5), method="L-BFGS-B", w=1/varasy, Ft=F_tot1), TRUE), "try-error")==FALSE)&(nbtest<nb.rei)){
+
             init=c(runif(1,0,1),runif(1,1,50),runif(1,1,10));
+            nbtest=nbtest+1;
         }
+        #re=optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=rep(0,0,3), upper=c(1,Inf,Inf), method="L-BFGS-B", w=1/varasy, Ft=F_tot1);
         re=optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(0.01,0.0005,2), upper=c(0.5,0.01,5), method="L-BFGS-B", w=1/varasy, Ft=F_tot1);
         pim[nbit,1]=re$par[1]
         pim[nbit,2]=re$par[2]
@@ -289,9 +313,9 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=300, x.step.pi=300, nb.r
   }
 
   return(list(abs.pi=abs,pi.init=PI_INIT,var.pi.init=VAR_PI_INIT,
-              #pi.m=pim,
-              #F.na.i=FNA.i,F.tot.i=FTOT.i,pi.trend=pi.trend,pi.trend.pava=pi.trend.pava,pi.init.pava=pi.init.pava,
-              abs.mod=ABSC[,1],pi.na=pi_na,F.na=FNA,F.tot=FTOT,F.obs=FOBS,F.mnar=FMNAR,pi.mcar=pi_mcar
-              #,eta=sta,q.n=q.n,q.c=q.c,s.q.n=s.q.n,s.q.c=s.q.c
+              abs.mod=ABSC[,1],pi.na=pi_na,F.na=FNA,F.tot=FTOT,F.obs=FOBS,F.mnar=FMNAR,pi.mcar=pi_mcar,
+              pi.m=pim,
+              F.na.i=FNA.i,F.tot.i=FTOT.i,pi.trend=pi.trend,pi.trend.pava=pi.trend.pava,pi.init.pava=pi.init.pava,
+              eta=sta,q.n=q.n,q.c=q.c,s.q.n=s.q.n,s.q.c=s.q.c
   ));
 }

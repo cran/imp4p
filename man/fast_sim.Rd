@@ -5,7 +5,7 @@
 Function to compute similarity measures between a vector and each row of a matrix.
 }
 \description{
-This function allows computing either the pairwise correlation between a vector and each row of a matrix if at least three side-by-side observed values, or the euclidean distance between side-by-side observed values if the length of the vector that is compared to each row of the matrix is less than 3.
+This function allows computing either the pairwise correlation between a vector and each row of a matrix if at least three side-by-side observed values, or the euclidean distance between side-by-side observed values if the length of the vector that is compared to each row of the matrix is less than 3. It is implemented thanks to the RCpp package.
 }
 \usage{
 fast_sim(prot, mat)

@@ -39,7 +39,7 @@ In the original algorithm, several predictions of each missing value are done fr
 The input matrix \code{tab} with imputed values instead of missing values.
 }
 \references{
-Bo, T. H., Dysvik, B., & Jonassen, I. (2004). LSimpute: accurate estimation of missing values in microarray data with least squares methods. Nucleic acids research, 32(3), e34-e34.
+Bo, T. H., Dysvik, B., & Jonassen, I. (2004). LSimpute: accurate estimation of missing values in microarray data with least squares methods. Nucleic acids research, 32(3), e34.
 }
 \author{
 Quentin Giai Gianetto <quentin2g@yahoo.fr>

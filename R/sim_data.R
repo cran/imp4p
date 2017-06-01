@@ -5,6 +5,7 @@ sim.data=function(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.rep
 
   tab=matrix(0,nb.pept,nb.sample*nb.cond*nb.repbio);
   pmnar=tab;
+  moyenne=pmnar;
   moyenne.cond=matrix(0,nb.pept,nb.cond);
   moyenne.repbio=matrix(0,nb.pept,nb.repbio);
 
@@ -18,6 +19,7 @@ sim.data=function(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.rep
       for (j in (nb.sample*(rb+i*nb.repbio)):(nb.sample*(rb+i*nb.repbio)+nb.sample-1)){
         for (k in 1:nb.pept){
           #pmnar[k,j+1]=dbeta((moyenne.cond[k,i+1]+moyenne.repbio[k,rb+1]-mimo)/(mamo-mimo),1,para)/para;
+          moyenne[k,j+1]=moyenne.cond[k,i+1]+moyenne.repbio[k,rb+1];
           if (((moyenne.cond[k,i+1]+moyenne.repbio[k,rb+1]-mimo)/(mamo-mimo))<=para){
               pmnar[k,j+1]=1-(moyenne.cond[k,i+1]+moyenne.repbio[k,rb+1]-mimo)/((mamo-mimo)*para);
           }
@@ -101,5 +103,5 @@ sim.data=function(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.rep
     tab.comp[which(is.na(tab))]=NA;
   }
 
-  return(list(dat.obs=tab.comp, dat.comp=tab.r, list.MCAR=listeMCAR, conditions=gen.cond(nb.cond,nb.repbio*nb.sample), repbio=gen.cond(nb.cond*nb.repbio,nb.sample)))
+  return(list(dat.obs=tab.comp, means=moyenne, dat.comp=tab.r, list.MCAR=listeMCAR, conditions=gen.cond(nb.cond,nb.repbio*nb.sample), repbio=gen.cond(nb.cond*nb.repbio,nb.sample)))
 }
