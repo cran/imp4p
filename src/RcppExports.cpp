@@ -7,7 +7,7 @@ using namespace Rcpp;
 
 // fast_apply_nb_na
 NumericVector fast_apply_nb_na(NumericMatrix X, int dim);
-RcppExport SEXP imp4p_fast_apply_nb_na(SEXP XSEXP, SEXP dimSEXP) {
+RcppExport SEXP _imp4p_fast_apply_nb_na(SEXP XSEXP, SEXP dimSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -19,7 +19,7 @@ END_RCPP
 }
 // fast_apply_nb_not_na
 NumericVector fast_apply_nb_not_na(NumericMatrix X, int dim);
-RcppExport SEXP imp4p_fast_apply_nb_not_na(SEXP XSEXP, SEXP dimSEXP) {
+RcppExport SEXP _imp4p_fast_apply_nb_not_na(SEXP XSEXP, SEXP dimSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -31,7 +31,7 @@ END_RCPP
 }
 // fast_apply_sd_na_rm_T
 NumericVector fast_apply_sd_na_rm_T(NumericMatrix X, int dim);
-RcppExport SEXP imp4p_fast_apply_sd_na_rm_T(SEXP XSEXP, SEXP dimSEXP) {
+RcppExport SEXP _imp4p_fast_apply_sd_na_rm_T(SEXP XSEXP, SEXP dimSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -43,7 +43,7 @@ END_RCPP
 }
 // fast_apply_sum_na_rm_T
 NumericVector fast_apply_sum_na_rm_T(NumericMatrix X, int dim);
-RcppExport SEXP imp4p_fast_apply_sum_na_rm_T(SEXP XSEXP, SEXP dimSEXP) {
+RcppExport SEXP _imp4p_fast_apply_sum_na_rm_T(SEXP XSEXP, SEXP dimSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -55,7 +55,7 @@ END_RCPP
 }
 // fast_sim
 NumericVector fast_sim(NumericVector prot, NumericMatrix mat);
-RcppExport SEXP imp4p_fast_sim(SEXP protSEXP, SEXP matSEXP) {
+RcppExport SEXP _imp4p_fast_sim(SEXP protSEXP, SEXP matSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;

@@ -6,6 +6,8 @@ Imputing missing values by assuming that the distribution of complete values is 
 }
 \description{
 This function allows imputing missing values under the assumption that the distribution of complete values has to be Gaussian in each column.
+
+Note that the imputed values are not necessary small values (compared to observed values).
 }
 \usage{
 impute.igcda(tab, tab.imp, conditions, q=0.95)
