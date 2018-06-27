@@ -45,14 +45,13 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
-nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
+res.sim=sim.data(nb.pept=2000,nb.miss=600);
 
-#Imputation of missing values with the slsa algorithm
+#Imputation of missing values with a MCAR-devoted algorithm: here the slsa algorithm
 dat.slsa=impute.slsa(tab=res.sim$dat.obs,conditions=res.sim$condition,repbio=res.sim$repbio);
 
 #Imputation of missing values under a Gaussian assumption
-dat.gauss=impute.igcda(tab=result$tab.mod, tab.imp=dat.slsa, conditions=res.sim$conditions);
+dat.gauss=impute.igcda(tab=res.sim$dat.obs, tab.imp=dat.slsa, conditions=res.sim$conditions);
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

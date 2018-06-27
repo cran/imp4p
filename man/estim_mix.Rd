@@ -8,8 +8,8 @@ Estimation of a mixture model of MCAR and MNAR values in each column of a data m
 This function allows estimating a mixture model of MCAR and MNAR values in each column of data sets similar to the ones which can be studied in MS-based quantitative proteomics. Such data matrices contain intensity values of identified peptides.
 }
 \usage{
-estim.mix(tab, tab.imp, conditions, x.step.mod=100,
-x.step.pi=100, nb.rei=50, method=1, gridsize=100)
+estim.mix(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100,
+nb.rei=100, method=1, gridsize=100)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -112,10 +112,9 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.1,para=0.5,nb.cond=2,nb.repbio=3,
-nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
+res.sim=sim.data(nb.pept=2000,nb.miss=600);
 
-#Imputation of missing values with the slsa algorithm
+#Imputation of missing values with a MCAR-devoted algorithm: here the slsa algorithm
 dat.slsa=impute.slsa(tab=res.sim$dat.obs,conditions=res.sim$condition,repbio=res.sim$repbio);
 
 #Estimation of the mixture model

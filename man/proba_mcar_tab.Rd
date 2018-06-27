@@ -40,10 +40,9 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 \examples{
 \donttest{
 #Simulating data
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
-nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
+res.sim=sim.data(nb.pept=2000,nb.miss=600,para=5);
 
-#Imputation of missing values with the slsa algorithm
+#Imputation of missing values with a MCAR-devoted algorithm: here the slsa algorithm
 dat.slsa=impute.slsa(tab=res.sim$dat.obs,conditions=res.sim$condition,repbio=res.sim$repbio);
 
 #Estimation of the mixture model
@@ -54,14 +53,21 @@ born=estim.bound(tab=res.sim$dat.obs,conditions=res.sim$condition);
 proba=prob.mcar.tab(born$tab.lower,born$tab.upper,res);
 
 #Histogram of probabilities to be MCAR associated to generated MCAR values
-hist(proba[data$list.MCAR[,1],1],
+hist(proba[res.sim$list.MCAR[[1]],1],
 
 freq=FALSE,main="Estimated probabilities to be MCAR for known MCAR values",xlab="",col=2);
 
 #Histogram of probabilities to be MCAR associated to generated MNAR values
-hist(proba[which(is.na(data$dat.obs[,1]))[!which(is.na(data$dat.obs[,1]))\%in\%data$list.MCAR[,1]],1],
+hist(
 
-freq=FALSE,main="Estimated probabilities to be MCAR for known MNAR values",xlab="",col=4);
+proba[which(is.na(res.sim$dat.obs[,1]))[
+
+!which(is.na(res.sim$dat.obs[,1]))\%in\%res.sim$list.MCAR[[1]]],1
+
+],
+
+freq=FALSE,main="Estimated probabilities to be MCAR for known MNAR values",xlab="",col=4
+);
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

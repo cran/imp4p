@@ -6,7 +6,7 @@
 ####################################
 
 
-estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.rei=50, method=1, gridsize=100){
+estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.rei=100, method=1, gridsize=100){
 
   #require(Iso);
   min.x=min(tab.imp,na.rm=TRUE);
@@ -99,9 +99,9 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.r
       for (x in absi[,j]){
         #Initial estimator of the proportion (1-F_na(x))/(1-F(x))
         if (((pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x))!=1)){
-            pi_init_x=(1-F_na(x))/(1-(pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x)));
+          pi_init_x=(1-F_na(x))/(1-(pi_na[j]*F_na(x)+(1-pi_na[j])*F_obs(x)));
         }else{
-            pi_init_x=(1-F_na(x))/(1-(1-1e-10));
+          pi_init_x=(1-F_na(x))/(1-(1-1e-10));
         }
         pi_init=c(pi_init,pi_init_x);
       }
@@ -111,9 +111,10 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.r
       }
       xmin=absi[kx,j];
       kx=1;
-      while ((kx<length(pi_init))&(pi_init[kx]>=(max(pi_init,na.rm=TRUE)-min(pi_init,na.rm=TRUE))/2)){
+      while ((kx<length(pi_init))&(pi_init[kx]>=(min(pi_init,na.rm=TRUE)+2*(min(c(1,max(pi_init,na.rm=TRUE)))-min(pi_init,na.rm=TRUE))/3))){
         kx=kx+1;
       }
+      #if (kx>(length(absi[,j])*0.8)){kx=floor(length(absi[,j])*0.8);}
       xmean=absi[kx,j];
       if(xmin>(xmean-(xmax-xmean))){
         xmin=(xmean-(xmax-xmean));
@@ -125,7 +126,8 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.r
           pi_init=c(pi_init,pi_init_x)
         }
       }
-      abs[,j]=seq(xmin,xmax,length.out=x.step.pi)
+
+      abs[,j]=seq(xmean,xmax,length.out=x.step.pi);
 
       ############
       #Estimation of pi^MLE(x)
@@ -172,31 +174,35 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.r
 
       }
       varasy=varasy/length(tab2[which(!is.na(tab2[,j])),j])
-      varasy[varasy<(0.005^2)]=(0.005^2);
+      varasy[varasy<(0.001^2)]=(0.001^2);
+
       PI_INIT[,j]=pi_init;
       VAR_PI_INIT[,j]=varasy;
 
-      #Function to minimize
+      #Minimization step
       #The minimization is performed nb.rei times to try to find a global minimum
       pim=matrix(0,nb.rei,4)
       for (nbit in 1:nb.rei){
         init=c(runif(1,0,0.5),runif(1,1,50),runif(1,1,10))
         nbtest=1;
-        #while (!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=rep(0,0,3), upper=c(1,Inf,Inf), method="L-BFGS-B", w=1/varasy, Ft=F_tot1), TRUE), "try-error")==FALSE){
-        while ((!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(0.01,0.0005,2), upper=c(0.5,0.01,5), method="L-BFGS-B", w=1/varasy, Ft=F_tot1), TRUE), "try-error")==FALSE)&(nbtest<nb.rei)){
-
-            init=c(runif(1,0,1),runif(1,1,50),runif(1,1,10));
-            nbtest=nbtest+1;
+        #Find a "good" starting point for the minimization
+        while ((!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(min(pi_init),0,1), upper=c(min(pi_init)+0.2,0.5,10), method="L-BFGS-B", w=(1/varasy)/(sum(1/varasy)), Ft=F_tot1), TRUE), "try-error")==FALSE)&(nbtest<nb.rei)){
+          init=c(runif(1,0,1),runif(1,1,50),runif(1,1,10));
+          nbtest=nbtest+1;
         }
-        #re=optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=rep(0,0,3), upper=c(1,Inf,Inf), method="L-BFGS-B", w=1/varasy, Ft=F_tot1);
-        re=optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(0.01,0.0005,2), upper=c(0.5,0.01,5), method="L-BFGS-B", w=1/varasy, Ft=F_tot1);
+        #Set of minimizations
+        re=optim(init, fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(min(pi_init),0,1), upper=c(min(pi_init)+0.2,0.5,10), method="L-BFGS-B", w=(1/varasy)/(sum(1/varasy)), Ft=F_tot1);
         pim[nbit,1]=re$par[1]
         pim[nbit,2]=re$par[2]
         pim[nbit,3]=re$par[3]
         pim[nbit,4]=re$value
       }
+      #Final minimization
+      re=optim(pim[which.min(pim[,4]),1:3], fr, gr=NULL, x=(abs[,j]-xmin) , pi_est=pi_init, lower=c(min(pi_init),0,1), upper=c(min(pi_init)+0.2,0.5,10), method="L-BFGS-B", w=(1/varasy)/(sum(1/varasy)), Ft=F_tot1);
+      pim=rbind(pim,c(re$par[1],re$par[2],re$par[3],re$value));
 
       #Final estimation of the proportion of MCAR values with different methods
+      #1 is the method by default
       pi_trend=rep(0,length(abs[,j]))
       pi_trend_pava=rep(0,length(abs[,j]))
       pi_init_pava=rep(0,length(abs[,j]))
@@ -239,10 +245,13 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.r
         dder=diff(distance[2:length(distance)])-diff(distance[1:(length(distance)-1)]);
         pi_mcar[j] <- 1-(which.max(dder)+1)/gridsize;
       }
-      pi_mcar[j] = max(min(pi_mcar[j],1-1e-5),1e-5);
       pi.trend[,j]=pi_trend;
       pi.trend.pava[,j]=pi_trend_pava;
       pi.init.pava[,j]=pi_init_pava;
+
+      #Ensure the estimated proportion is between 0 and 1
+      pi_mcar[j] = max(min(pi_mcar[j],1-1e-5),1e-5);
+
 
       ############
       #Find the normal distribution of complete values with
@@ -313,9 +322,9 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100, nb.r
   }
 
   return(list(abs.pi=abs,pi.init=PI_INIT,var.pi.init=VAR_PI_INIT,
-              abs.mod=ABSC[,1],pi.na=pi_na,F.na=FNA,F.tot=FTOT,F.obs=FOBS,F.mnar=FMNAR,pi.mcar=pi_mcar,
-              pi.m=pim,
-              F.na.i=FNA.i,F.tot.i=FTOT.i,pi.trend=pi.trend,pi.trend.pava=pi.trend.pava,pi.init.pava=pi.init.pava,
-              eta=sta,q.n=q.n,q.c=q.c,s.q.n=s.q.n,s.q.c=s.q.c
+              abs.mod=ABSC[,1],pi.na=pi_na,F.na=FNA,F.tot=FTOT,F.obs=FOBS,F.mnar=FMNAR,pi.mcar=pi_mcar#,
+              #pi.m=pim,
+              #F.na.i=FNA.i,F.tot.i=FTOT.i,pi.trend=pi.trend,pi.trend.pava=pi.trend.pava,pi.init.pava=pi.init.pava,
+              #eta=sta,q.n=q.n,q.c=q.c,s.q.n=s.q.n,s.q.c=s.q.c
   ));
 }

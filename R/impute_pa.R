@@ -7,6 +7,10 @@
 
 impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distribution = "unif", param1 = 3, param2 = 1, R.q.min=1){
 
+  if (length(colnames(tab))==0){
+    colnames(tab)=seq(1,ncol(tab),by=1)
+  }
+
   tab_imp = tab
 
   qu = apply(tab_imp, 2, quantile, na.rm = TRUE, q.min)
@@ -25,15 +29,14 @@ impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distrib
 
     nb_rep[i] = sum((conditions == levels(conditions)[i]))
 
-    sde = apply(tab_imp[, (k:(k + nb_rep[i] - 1))], 1, sd,
-
-                na.rm = TRUE)
+    sde = apply(tab_imp[, (k:(k + nb_rep[i] - 1))], 1, sd, na.rm = TRUE)
 
     while (j < (k + nb_rep[i])) {
 
       if (distribution == "unif") {
 
         param=rbind(param,data.frame(n = sum(is.na(tab_imp[,j])), min = qu[j] - eps - q.norm * median(sde,na.rm = TRUE), max = qu[j] - eps))
+
         rownames(param)[j]=colnames(tab)[j]
 
         tab_imp[which(is.na(tab_imp[, j])), j] = runif(n = sum(is.na(tab_imp[,j])), min = qu[j] - eps - q.norm * median(sde,na.rm = TRUE), max = qu[j] - eps)
@@ -43,6 +46,7 @@ impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distrib
       else if (distribution == "beta") {
 
         param=rbind(param,data.frame(n = sum(is.na(tab_imp[,j])), min = qu[j] - eps - q.norm * median(sde,na.rm = TRUE), max = qu[j] - eps, param1 = param1, param2 = param2))
+
         rownames(param)[j]=colnames(tab)[j]
 
         tab_imp[which(is.na(tab_imp[, j])), j] = translatedRandomBeta(n = sum(is.na(tab_imp[,j])), min = qu[j] - eps - q.norm * median(sde,na.rm = TRUE), max = qu[j] - eps, param1 = param1, param2 = param2)
@@ -52,6 +56,7 @@ impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distrib
       else if (distribution == "dirac") {
 
         param=rbind(param,data.frame(imputed.value=R.q.min*quantile(tab[,j], probs=q.min, na.rm=T)))
+
         rownames(param)[j]=colnames(tab)[j]
 
         tab_imp[which(is.na(tab_imp[, j])), j] = R.q.min*quantile(tab[,j], probs=q.min, na.rm=T)
@@ -69,7 +74,4 @@ impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distrib
   return(list(tab.imp=tab_imp,para=param))
 
 }
-
-
-
 

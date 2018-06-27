@@ -8,8 +8,10 @@ Simulation of data sets by controlling the proportion of MCAR values and the dis
 This function simulates data sets similar to MS-based bottom-up proteomic data sets.
 }
 \usage{
-sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
-nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2)
+
+sim.data(nb.pept=10000,nb.miss=6000,pi.mcar=0.2,para=1.5,nb.cond=1,nb.repbio=3,
+nb.sample=3,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2)
+
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,12 +34,14 @@ Next, the MCAR values are generated in each column by random draws without repla
 
 \eqn{P(x_{ij} is MNAR)=1-(x_{ij}-min_i(x_{ij}))/((max_i(x_{ij})-min_i(x_{ij}))*(para))}
 
-where \eqn{f_{B(1,para)}} corresponds to the density of a Beta distribution with parameters \eqn{1} and \eqn{para}. If \eqn{para=1}, then the MNAR values are uniformly distributed among intensity level. More \eqn{para} is high and more the MNAR values arise for small intensity levels and not for high intensity levels.
+where \eqn{para} allows adjusting the distribution of MNAR values. If \eqn{para=0}, then the MNAR values are uniformly distributed among intensity level. More \eqn{para} is high and more the MNAR values arise for small intensity levels and not for high intensity levels.
 }
 \value{
 \item{dat.obs}{The simulated data set.}
 \item{dat.comp}{The simulated data set without missing values.}
 \item{list.MCAR}{The index of MCAR values among the rows in each column of the data set.}
+\item{nMCAR}{The number of MCAR values in each sample (after deleting rows with only generated missing values).}
+\item{nNA}{The number of missing values in each sample (after deleting rows with only generated missing values).}
 \item{conditions}{A vector of factors indicating the biological condition to which each sample belongs.}
 \item{repbio}{A vector of factors indicating the biological sample to which each sample belongs.}
 }
@@ -58,15 +62,16 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 %}
 \examples{
 \donttest{
-## The function is currently defined as
-res.sim=sim.data(nb.pept=2000,nb.miss=600,pi.mcar=0.2,para=0.5,nb.cond=2,nb.repbio=3,
-nb.sample=5,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2);
+## The function can be used as
+res.sim=sim.data(nb.pept=2000,nb.miss=600);
 ## Simulated data matrix
 data=res.sim$dat.obs;
 ## Vector of conditions of membership for each sample
 cond=res.sim$conditions;
 ## Vector of biological sample of membership for each sample
 repbio=res.sim$repbio;
+## Percentage of generated MCAR values for each sample
+pi_mcar=res.sim$nMCAR/res.sim$nNA
 }
 }
 

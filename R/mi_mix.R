@@ -5,9 +5,10 @@
 #
 ####################################
 
-mi.mix = function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
-                   reptech = NULL, nb.iter = 3, nknn = 15, weight = 1, selec = "all",
-                   siz = 500, ind.comp = 1, methodi = "slsa", q = 0.95, progress.bar = TRUE){
+mi.mix=function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
+                 reptech = NULL, nb.iter = 3, nknn = 15, weight = 1, selec = "all",
+                 siz = 500, ind.comp = 1, methodi = "mle", q = 0.95, progress.bar = TRUE, details= FALSE)
+{
   if (is.null(repbio)) {
     repbio = as.factor(1:length(conditions))
   }
@@ -19,12 +20,12 @@ mi.mix = function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
   }
   if (selec == "all") {
     if (siz > nrow(tab)) {
-      siz = nrow(tab) - 1
+      siz = nrow(tab) - 1;
     }
   }
   else {
     if (siz > selec) {
-      siz = selec - 1
+      siz = selec - 1;
     }
   }
   data_imp = array(NA, dim = c(nrow(tab), ncol(tab), nb.iter))
@@ -70,15 +71,16 @@ mi.mix = function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
         }
         list.select = sample(lab, size =  max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
         list.select = c(list.select, rna[i])
-        tab.mod.imp = NULL
+        tab.mod.imp2 = NULL
         nb_rep = rep(0, nb_cond)
         k = 1
         for (it in 1:nb_cond) {
           nb_rep[it] = sum((conditions == levels(conditions)[it]))
-          tab.mod.imp = cbind(tab.mod.imp, impute.wrapper.MLE(tab.mod[list.select,
-                                                                      (k:(k + nb_rep[it] - 1))]))
+          tab.mod.imp2 = cbind(tab.mod.imp2, impute.wrapper.MLE(tab.mod[list.select,
+                                                                        (k:(k + nb_rep[it] - 1))]))
           k = k + nb_rep[it]
         }
+        tab.mod.imp[list.select, ] = tab.mod.imp2
       }
       else {
         lab = (1:nrow(tab.mod))[-rna[i]]
@@ -106,6 +108,13 @@ mi.mix = function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
     }
     iter = iter + 1
   }
-  data_fin = apply(data_imp, 1:2, mean)
+  if (details == TRUE){
+      data_fin = list(
+      imputed.matrix=apply(data_imp, 1:2, mean),
+      sd.imputed.matrix=apply(data_imp, 1:2, sd),
+      all.imputed.matrices=data_imp);
+  }else{
+      data_fin = apply(data_imp, 1:2, mean)
+  }
   return(data_fin)
 }

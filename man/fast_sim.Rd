@@ -5,7 +5,7 @@
 Function to compute similarity measures between a vector and each row of a matrix.
 }
 \description{
-This function allows computing either the pairwise correlation between a vector and each row of a matrix if at least three side-by-side observed values, or the euclidean distance between side-by-side observed values if the length of the vector that is compared to each row of the matrix is less than 3. It is implemented thanks to the RCpp package.
+This function allows computing either the pairwise correlation between a vector and each row of a matrix if each has at least 3 side-by-side observed values, or 1/(1+d) where d is the euclidean distance between side-by-side observed values if the vector contains less than 3 observed values. If the vector contains more than 3 observed values and a row of the matrix has less than 3 observed values, then it gives NA. It is implemented thanks to the RCpp package.
 }
 \usage{
 fast_sim(prot, mat)
@@ -13,7 +13,7 @@ fast_sim(prot, mat)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{prot}{
-A numeric vector without missing values.
+A numeric vector containing numeric and missing values.
 }
   \item{mat}{
 A data matrix containing numeric and missing values.
@@ -41,12 +41,13 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 %\code{\link{impute.slsa}}
 %}
 \examples{
-## The function is currently defined as
-##function (prot, mat)
-##{
-##    .Call("imp4p_fast_sim", PACKAGE = "imp4p", prot, mat)
-## }
-##
+\donttest{
+#Simulating data
+res.sim=sim.data(nb.pept=20000,nb.miss=1000);
+
+#Fast computation of similarities
+fast_sim(res.sim$dat.obs[1,],res.sim$dat.obs);
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

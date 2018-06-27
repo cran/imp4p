@@ -152,7 +152,7 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
             y[i, ]=mx1%*%lg;
           }
 
-          #delete outliers
+          #delete outlier responses
           for (j in 1:ncol(y)){
             qyj=quantile(y[,j],na.rm=T);
             bi=qyj[3]-0.5*(qyj[4]-qyj[2]);
@@ -165,7 +165,7 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
           if (is.numeric(weight)==TRUE){w=row.r^weight;}
           if (weight=="o"){w=(row.r**2/(1-row.r**2+0.000001))**2;}
 
-          #final imputation by weighting the observed responses
+          #final imputation by weighting the responses
           roww[row.exp]<-apply(y, 2, function(x){xx=x[!is.na(x)];ww=w[!is.na(x)];ww[1:min(c(nknn,length(ww)))]=ww[1:min(c(nknn,length(ww)))]/sum(ww[1:min(c(nknn,length(ww)))]);sum(ww[1:min(c(nknn,length(ww)))]*xx[1:min(c(nknn,length(ww)))]);})
 
           #to limit imputations in a reasonable neighborhood
