@@ -7,8 +7,7 @@
 
 mi.mix=function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
                  reptech = NULL, nb.iter = 3, nknn = 15, weight = 1, selec = "all",
-                 siz = 500, ind.comp = 1, methodi = "mle", q = 0.95, progress.bar = TRUE, details= FALSE)
-{
+                 siz = 500, ind.comp = 1, methodi = "mle", q = 0.95, progress.bar = TRUE, details= FALSE){
   if (is.null(repbio)) {
     repbio = as.factor(1:length(conditions))
   }
@@ -63,24 +62,14 @@ mi.mix=function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
       tab.mod.imp = tab.mod
       tab.mod[rna[i], ] = tab.mvs[rna[i], ]
       if (methodi == "mle") {
-        nb_cond = length(levels(conditions))
         lab = (1:nrow(tab.mod))[-rna[i]]
         sel = selec
         if (selec == "all") {
           sel = nrow(tab.mod) - 1
         }
-        list.select = sample(lab, size =  max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
+        list.select = sample(lab, size = max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
         list.select = c(list.select, rna[i])
-        tab.mod.imp2 = NULL
-        nb_rep = rep(0, nb_cond)
-        k = 1
-        for (it in 1:nb_cond) {
-          nb_rep[it] = sum((conditions == levels(conditions)[it]))
-          tab.mod.imp2 = cbind(tab.mod.imp2, impute.wrapper.MLE(tab.mod[list.select,
-                                                                        (k:(k + nb_rep[it] - 1))]))
-          k = k + nb_rep[it]
-        }
-        tab.mod.imp[list.select, ] = tab.mod.imp2
+        tab.mod.imp[list.select, ] = impute.mle(tab.mod[list.select,], conditions = conditions);
       }
       else {
         lab = (1:nrow(tab.mod))[-rna[i]]
@@ -88,20 +77,15 @@ mi.mix=function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
         if (selec == "all") {
           sel = nrow(tab.mod) - 1
         }
-        #        print(lab)
-        #       print(max(sel, min(siz,nrow(tab.mod) - 1)))
         list.select = sample(lab, size = max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
         list.select = c(list.select, rna[i])
-        tab.mod.imp[list.select, ] = impute.slsa(tab.mod[list.select,
-                                                         ], conditions = conditions, repbio = repbio,
+        tab.mod.imp[list.select, ] = impute.slsa(tab.mod[list.select,], conditions = conditions, repbio = repbio,
                                                  reptech = reptech, nknn = nknn, weight = weight,
                                                  selec = selec, progress.bar = FALSE, ind.comp = ind.comp)
       }
-      data_imp[rna[i], , iter] = tab.mod.imp[list.select,
-                                             ][length(list.select), ]
+      data_imp[rna[i], , iter] = tab.mod.imp[list.select,][length(list.select), ];
       if (progress.bar == TRUE) {
-        if (i%/%floor(0.01 * length(rna)) == i/floor(0.01 *
-                                                     length(rna))) {
+        if (i%/%floor(0.01 * length(rna)) == i/floor(0.01 *length(rna))) {
           cat(c((i%/%(0.01 * length(rna)))), "% - ")
         }
       }

@@ -9,25 +9,13 @@ impute.mi=function(tab, conditions, repbio=NULL, reptech=NULL, nb.iter=3, nknn=1
   #Imputation of missing values with the slsa algorithm
   dat.slsa=impute.slsa(tab=tab, conditions=conditions, repbio=repbio, reptech=reptech, nknn=nknn, selec=selec, weight=weight, ind.comp=ind.comp, progress.bar=progress.bar);
   if (methodi == "mle"){
-    nb_cond = length(levels(conditions))
-    tab.mod.imp2 = NULL
-    nb_rep = rep(0, nb_cond)
-    k = 1
-    for (it in 1:nb_cond) {
-      nb_rep[it] = sum((conditions == levels(conditions)[it]))
-      tab.mod.imp2 = cbind(tab.mod.imp2, impute.wrapper.MLE(tab[,(k:(k + nb_rep[it] - 1))]))
-      k = k + nb_rep[it]
-    }
-    dat.slsa = tab.mod.imp2
+     dat.slsa=impute.mle(tab=tab, conditions=conditions);
   }
-  #dat.slsa=impute.rand(tab=tab,conditions=conditions);
 
   if (progress.bar==TRUE){cat(paste("\n\n 2/ Estimation of the mixture model in each sample... \n  "));}
 
   #Estimation of the mixture model
   res=estim.mix(tab=tab, tab.imp=dat.slsa, conditions=conditions, x.step.mod=x.step.mod, x.step.pi=x.step.pi, nb.rei=nb.rei, method=method, gridsize=gridsize);
-
-  print(res$pi.mcar)
 
   if (progress.bar==TRUE){cat(paste("\n 3/ Estimation of the probabilities each missing value is MCAR... \n  "));}
 

@@ -17,17 +17,7 @@ impute.mix <-function (tab, prob.MCAR, conditions, repbio=NULL, reptech=NULL, me
   if (method=="slsa"){
       tab.imp=impute.slsa(tab=tab.mvs, conditions=conditions, repbio=repbio, reptech=reptech, nknn=nknn, selec=min(selec,nrow(tab.mvs)), weight=weight, ind.comp=ind.comp, progress.bar=progress.bar);
   }else{
-      nb_cond=length(levels(conditions));
-      nb_rep=rep(0,nb_cond);
-      k=1;
-      tab.imp=NULL;
-      #MLE condition by condition
-      for (it in 1:nb_cond){
-        #Number of replicates in the condition
-        nb_rep[it]=sum((conditions==levels(conditions)[it]));
-        tab.imp=cbind(tab.imp,impute.wrapper.MLE(tab.mvs[,(k:(k+nb_rep[it]-1))]));
-        k=k+nb_rep[it];
-      }
+      tab.imp=impute.mle(tab=tab.mvs, conditions=conditions);
   }
   tab.mvs[which(l.MCAR==1)]=tab.imp[which(l.MCAR==1)];
     
