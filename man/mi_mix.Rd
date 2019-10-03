@@ -26,7 +26,7 @@ progress.bar=TRUE, details=FALSE)
   \item{siz}{A parameter to select a part of the dataset to perform imputations with the SLSA or the MLE algorithm. This can be useful for big data sets. Note that \code{siz} needs to be inferior to \code{selec}.}
   \item{weight}{The way of weighting in the algorithm (see \code{\link{impute.slsa}}).}
   \item{ind.comp}{If \code{ind.comp=1}, only nearest neighbours without missing values are selected to fit linear models (see \code{\link{impute.slsa}}). Else, they can contain missing values.}
-  \item{methodi}{The method used for imputing data. If \code{methodi="mle"} (default), then the MLE algorithm is used (function \code{impute.wrapper.MLE} of the R package imputeLCMD), else the SLSA algorithm is used.}
+  \item{methodi}{The method used for imputing data. If \code{methodi="mle"} (default), then the MLE algorithm is used (function \code{imp.norm} of the R package norm), else the SLSA algorithm is used.}
   \item{q}{A quantile value (see \code{\link{impute.igcda}}).}
   \item{progress.bar}{If \code{TRUE}, a progress bar is displayed.}
   \item{details}{If \code{TRUE}, the function gives a list of three values: \code{imputed.matrix} a matrix with the average of imputed values for each missing value, \code{sd.imputed.matrix} a matrix with the standard deviations of imputed values for each missing value, \code{all.imputed.matrices} an array with all the \code{nb.iter} matrices of imputed values that have been generated.}

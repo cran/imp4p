@@ -5,7 +5,7 @@
 Function to compute similarity measures between a vector and each row of a matrix.
 }
 \description{
-This function allows computing either the pairwise correlation between a vector and each row of a matrix if each has at least 3 side-by-side observed values, or 1/(1+d) where d is the euclidean distance between side-by-side observed values if the vector contains less than 3 observed values. If the vector contains more than 3 observed values and a row of the matrix has less than 3 observed values, then it gives NA. It is implemented thanks to the RCpp package.
+This function allows computing a similarity measure between a vector and each row of a matrix. The similarity measure is defined by exp(-d^2) where d is the Euclidean distance between the vector and each row. It is implemented thanks to the RCpp package.
 }
 \usage{
 fast_sim(prot, mat)

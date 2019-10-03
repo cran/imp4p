@@ -8,11 +8,10 @@ Estimation of a matrix of probabilities that missing values are MCAR.
 This function returns a matrix of probabilities that each missing value is MCAR from specified confidence intervals.
 }
 \usage{
-prob.mcar.tab(tab.l,tab.u,res)
+prob.mcar.tab(tab.u,res)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{tab.l}{A numeric matrix of lower bounds for missing values.}
   \item{tab.u}{A numeric matrix of upper bounds for missing values.}
   \item{res}{An output list resulting from the function \code{\link{estim.mix}}.}
 }
@@ -20,7 +19,7 @@ prob.mcar.tab(tab.l,tab.u,res)
 %%  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-A numeric matrix of estimated probabilities to be MCAR for missing values in the confidence intervals defined thanks to \code{tab.l} and \code{tab.u}.
+A numeric matrix of estimated probabilities to be MCAR for missing values assuming upper bounds for them (\code{tab.u}).
 }
 %\references{
 %% ~put references to the literature/web site here ~
@@ -50,7 +49,7 @@ res=estim.mix(tab=res.sim$dat.obs, tab.imp=dat.slsa, conditions=res.sim$conditio
 
 #Computing probabilities to be MCAR
 born=estim.bound(tab=res.sim$dat.obs,conditions=res.sim$condition);
-proba=prob.mcar.tab(born$tab.lower,born$tab.upper,res);
+proba=prob.mcar.tab(born$tab.upper,res);
 
 #Histogram of probabilities to be MCAR associated to generated MCAR values
 hist(proba[res.sim$list.MCAR[[1]],1],

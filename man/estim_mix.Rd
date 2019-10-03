@@ -8,8 +8,8 @@ Estimation of a mixture model of MCAR and MNAR values in each column of a data m
 This function allows estimating a mixture model of MCAR and MNAR values in each column of data sets similar to the ones which can be studied in MS-based quantitative proteomics. Such data matrices contain intensity values of identified peptides.
 }
 \usage{
-estim.mix(tab, tab.imp, conditions, x.step.mod=100, x.step.pi=100,
-nb.rei=100, method=1, gridsize=100)
+estim.mix(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150,
+nb.rei=200)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -19,8 +19,6 @@ nb.rei=100, method=1, gridsize=100)
   \item{x.step.mod}{The number of points in the intervals used for estimating the cumulative distribution functions of the mixing model in each column.}
   \item{x.step.pi}{The number of points in the intervals used for estimating the proportion of MCAR values in each column.}
   \item{nb.rei}{The number of initializations of the minimization algorithm used to estimate the proportion of MCAR values (see Details).}
-  \item{method}{A numeric value indicating the method to use for estimating the proportion of MCAR values (see Details).}
-  \item{gridsize}{A numeric value indicating the number of possible choices used for estimating the proportion of MCAR values with the method of Patra and Sen (2015) (see Details).}
 }
 \details{
 This function aims to estimate the following mixture model in each column:
@@ -54,24 +52,7 @@ where
 where \eqn{s(x)^2} is an estimate of the asymptotic variance of \eqn{\hat{\pi}(x)}, \eqn{lower_x} is an estimate of the minimum of the complete values. To perform this minimization, the function \code{optim} with the method "L-BFGS-B" is used. Because it is function of its initialization, it is possible to reinitialize a number of times the minimisation algorithm with the argument \code{nb.rei}: the parameters leading to the lowest minimum are next kept.
 
 Once \code{k}, \code{a} and \code{d} are estimated, one can use several methods to estimate \eqn{\pi_{mcar}}: it is estimated
-
-by \eqn{k} if \code{method=1} (default);
-
-by \eqn{k+(1-k)\times\exp(-a\times [\max(x)-lower_x]^d)/(1-\hat{F}_{tot}(\max(x)))}
-
-if \code{method=2};
-
-by estimating a decreasing trend with the Pool-Adjacent-Violators (PAV) algorithm on
-
-\eqn{k+(1-k)\times\exp(-a\times [x-lower_x]^d)/(1-\hat{F}_{tot}(x))}
-
-and keeping the righmost value of this trend if \code{method=3};
-
-by estimating a decreasing trend with the PAV algorithm on \eqn{\hat{\pi}(x)} and keeping the righmost value of this trend if \code{method=4};
-
-by using the histogram of \eqn{\hat{\pi}(x)} if \code{method=5};
-
-by using the method of Patra and Sen (2015) adapted to our problematic if \code{method=6}.
+by \eqn{k};
 }
 \value{
 A list composed of:
@@ -86,16 +67,14 @@ A list composed of:
 
   where \code{x} belongs to \code{abs.pi[,j]} for each sample \code{j}.}
   \item{var.pi.init}{A numeric matrix containing the estimated asymptotic variances of \code{pi.init}.}
+  \item{trend.pi.init}{A numeric matrix containing the estimated trend of the model used in the minimization algorithm.}
   \item{abs.mod}{A numeric vector containing the interval used for estimating the mixture models in each column.}
   \item{pi.na}{A numeric vector containing the proportions of missing values in each column.}
   \item{F.na}{A numeric matrix containing the estimated cumulative distribution functions of missing values in each column on the interval \code{abs.mod}.}
   \item{F.tot}{A numeric matrix containing the estimated cumulative distribution functions of complete values in each column on the interval \code{abs.mod}.}
   \item{F.obs}{A numeric matrix containing the estimated cumulative distribution functions of observed values in each column on the interval \code{abs.mod}.}
-  \item{F.mnar}{A numeric matrix containing the estimated cumulative distribution functions of MNAR values in each column on the interval \code{abs.mod}.}
   \item{pi.mcar}{A numeric vector containing the estimations of the proportion of MCAR values in each column.}
-}
-\references{
-Patra, R. K., & Sen, B. (2015). Estimation of a two component mixture model with applications to multiple testing. Journal of the Royal Statistical Society: Series B (Statistical Methodology).
+  \item{MinRes}{A numeric matrix containing the three parameters of the model used in the minimization algorithm (three first rows) and the value of minimized function.}
 }
 \author{
 Quentin Giai Gianetto <quentin2g@yahoo.fr>

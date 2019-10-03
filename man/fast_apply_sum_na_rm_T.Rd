@@ -48,6 +48,11 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 ##        X, dim)
 ##  }
 ##
+## You can compare the execution time with a traditional apply function by
+## library(rbenchmark)
+## res.sim=sim.data(nb.pept=2000,nb.miss=600);
+## benchmark(fast_apply_sum_na_rm_T(res.sim$dat.obs, 1),
+##           apply(res.sim$dat.obs,1,sum,na.rm=TRUE))
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

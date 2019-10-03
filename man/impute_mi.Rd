@@ -10,8 +10,8 @@ This function allows imputing data sets containing peptide intensities with a mu
 \usage{
 impute.mi(tab, conditions, repbio=NULL, reptech=NULL, nb.iter=3, nknn=15, selec=1000,
 siz=900, weight=1, ind.comp=1, progress.bar=TRUE, x.step.mod=300,
-x.step.pi=300, nb.rei=100, method=1, gridsize=300, q=0.95, q.min=0, q.norm=3,
-eps=2, methodi="slsa");
+x.step.pi=300, nb.rei=100, q=0.95, q.min=0, q.norm=3,
+eps=2, methodi="mle");
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,7 +20,7 @@ eps=2, methodi="slsa");
   \item{repbio}{A vector of factors indicating the biological replicate to which each column belongs. Default is NULL (no experimental design is considered).}
   \item{reptech}{A vector of factors indicating the technical replicate to which each column belongs. Default is NULL (no experimental design is considered).}
   \item{nb.iter}{The number of iterations used for the multiple imputation method (see \code{\link{mi.mix}}).}
-  \item{methodi}{The method used for imputing data. If \code{methodi="mle"}, then the MLE algorithm is used (function \code{impute.wrapper.MLE} of the R package imputeLCMD), else the SLSA algorithm is used (default). (see \code{\link{mi.mix}})}
+  \item{methodi}{The method used for imputing data. If \code{methodi="mle"}, then the MLE algorithm is used (function \code{imp.norm} of the R package norm)(default), else the SLSA algorithm is used. (see \code{\link{mi.mix}})}
   \item{nknn}{The number of nearest neighbours used in the SLSA algorithm (see \code{\link{impute.slsa}}).}
   \item{selec}{A parameter to select a part of the dataset to find nearest neighbours between rows. This can be useful for big data sets (see \code{\link{impute.slsa}}).}
     \item{siz}{A parameter to select a part of the dataset to perform imputations with the SLSA algorithm or the MLE algorithm. This can be useful for big data sets (see \code{\link{mi.mix}}).}
@@ -30,8 +30,6 @@ eps=2, methodi="slsa");
   \item{x.step.mod}{The number of points in the intervals used for estimating the cumulative distribution functions of the mixing model in each column (see \code{\link{estim.mix}}).}
   \item{x.step.pi}{The number of points in the intervals used for estimating the proportion of MCAR values in each column (see \code{\link{estim.mix}}).}
   \item{nb.rei}{The number of initializations of the minimization algorithm used to estimate the proportion of MCAR values (see Details) (see \code{\link{estim.mix}}).}
-  \item{method}{A numeric value indicating the method to use for estimating the proportion of MCAR values (see \code{\link{estim.mix}}).}
-  \item{gridsize}{A numeric value indicating the number of possible choices used for estimating the proportion of MCAR values with the method of Patra and Sen (2015) (see \code{\link{estim.mix}}).}
   \item{q}{A quantile value (see \code{\link{impute.igcda}}).}
   \item{q.min}{A quantile value of the observed values allowing defining the maximal value which can be generated. Default is 0 (the maximal value is the minimum of observed values minus \code{eps}) (see \code{\link{impute.pa}}).}
   \item{q.norm}{A quantile value of a normal distribution allowing defining the minimal value which can be generated. Default is 3 (the minimal value is the maximal value minus qn*median(sd(observed values)) where sd is the standard deviation of a row in a condition) (see \code{\link{impute.pa}}).}

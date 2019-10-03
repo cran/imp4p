@@ -5,33 +5,23 @@
 #
 ####################################
 
-mi.mix=function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
+mi.mix=function(tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
                  reptech = NULL, nb.iter = 3, nknn = 15, weight = 1, selec = "all",
                  siz = 500, ind.comp = 1, methodi = "mle", q = 0.95, progress.bar = TRUE, details= FALSE){
-  if (is.null(repbio)) {
-    repbio = as.factor(1:length(conditions))
-  }
-  if (is.null(reptech)) {
-    reptech = as.factor(1:length(conditions))
-  }
-  if (selec>=nrow(tab)){
-    selec=nrow(tab)-1;
-  }
+
+  if (is.null(repbio)) {repbio = as.factor(1:length(conditions));}
+  if (is.null(reptech)) {reptech = as.factor(1:length(conditions));}
+  if (selec>=nrow(tab)){selec=nrow(tab)-1;}
   if (selec == "all") {
-    if (siz > nrow(tab)) {
-      siz = nrow(tab) - 1;
-    }
+    if (siz > nrow(tab)) {siz = nrow(tab) - 1;}
   }
   else {
-    if (siz > selec) {
-      siz = selec - 1;
-    }
+    if (siz > selec) {siz = selec - 1;}
   }
+
   data_imp = array(NA, dim = c(nrow(tab), ncol(tab), nb.iter))
   l.NA = matrix(0, nrow(tab), ncol(tab))
-  if (progress.bar == TRUE) {
-    cat(paste("\n Iterations: \n"))
-  }
+  if (progress.bar == TRUE) {cat(paste("\n Iterations: \n"));}
   iter = 1
   while ((iter <= nb.iter)) {
     if (progress.bar == TRUE) {
@@ -44,8 +34,7 @@ mi.mix=function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
     l.MNAR = l.NA - l.MCAR
     l.MCAR = l.NA * l.MCAR
     l.MNAR = l.NA * l.MNAR
-    tab.mvs[which(l.MCAR == 1)] = tab.imp[which(l.MCAR ==
-                                                  1)]
+    tab.mvs[which(l.MCAR == 1)] = tab.imp[which(l.MCAR == 1)]
     data_imp[, , iter] = tab.mvs
     tab.mvs.imp = impute.igcda(tab = tab.mvs, tab.imp = tab.imp,
                                conditions = conditions, q = q)
@@ -64,19 +53,14 @@ mi.mix=function (tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
       if (methodi == "mle") {
         lab = (1:nrow(tab.mod))[-rna[i]]
         sel = selec
-        if (selec == "all") {
-          sel = nrow(tab.mod) - 1
-        }
+        if (selec == "all") {sel = nrow(tab.mod) - 1;}
         list.select = sample(lab, size = max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
         list.select = c(list.select, rna[i])
         tab.mod.imp[list.select, ] = impute.mle(tab.mod[list.select,], conditions = conditions);
-      }
-      else {
+      }else {
         lab = (1:nrow(tab.mod))[-rna[i]]
         sel = selec
-        if (selec == "all") {
-          sel = nrow(tab.mod) - 1
-        }
+        if (selec == "all") {sel = nrow(tab.mod) - 1;}
         list.select = sample(lab, size = max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
         list.select = c(list.select, rna[i])
         tab.mod.imp[list.select, ] = impute.slsa(tab.mod[list.select,], conditions = conditions, repbio = repbio,

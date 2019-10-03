@@ -46,6 +46,16 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 ##{
 ##    .Call("imp4p_fast_apply_nb_na", PACKAGE = "imp4p", X, dim)
 ##  }
+##
+## You can compare the execution time with a traditional apply function by
+## library(rbenchmark)
+## res.sim=sim.data(nb.pept=2000,nb.miss=600);
+## benchmark(fast_apply_nb_na(res.sim$dat.obs, 1),
+##           apply(res.sim$dat.obs,1,function(x)sum(is.na(x))))
+##
+##
+##
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

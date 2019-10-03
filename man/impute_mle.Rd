@@ -5,7 +5,7 @@
 Imputing missing values using a maximum likelihood estimation (MLE).
 }
 \description{
-Imputing missing values using the EM algorithm proposed in section 5.4.1 of Schafer (1997). 
+Imputing missing values using the EM algorithm proposed in section 5.4.1 of Schafer (1997). The function is based on the imp.norm function of the R package norm.
 }
 \usage{
 impute.mle(tab, conditions)
@@ -41,7 +41,7 @@ Quentin Giai Gianetto <quentin2g@yahoo.fr>
 #Simulating data
 res.sim=sim.data(nb.pept=2000,nb.miss=600,nb.cond=2);
 
-#Imputation of missing values with the slsa algorithm
+#Imputation of missing values with the mle algorithm
 dat.mle=impute.mle(tab=res.sim$dat.obs,conditions=res.sim$condition);
 }
 }
