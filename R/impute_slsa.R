@@ -12,8 +12,34 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
 
   if (is.null(repbio)){repbio=as.factor(1:length(conditions));}
   if (is.null(reptech)){reptech=as.factor(1:length(conditions));}
+  if (nknn>sqrt(nrow(tab))){nknn=floor(sqrt(nrow(tab)));warning("The number of nearest neighbours is too high.");}
+  if (nknn<=5){warning("The number of nearest neighbours is too low (<=5).");}
+  if (ncol(tab)<2){warning("The number of columns (samples) has to be superior to 1.");}
 
   tab_imp=as.matrix(tab);
+
+  new_tab=NULL
+  new_conditions=NULL
+  new_repbio=NULL
+  new_reptech=NULL
+  index=NULL
+  for (j in 1:length(levels(conditions))){
+
+    index=c(index,which(conditions==levels(conditions)[j]))
+    new_tab=cbind(new_tab,tab_imp[,which(conditions==levels(conditions)[j])])
+    new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
+    new_repbio=c(new_repbio,repbio[which(conditions==levels(conditions)[j])])
+    new_reptech=c(new_reptech,reptech[which(conditions==levels(conditions)[j])])
+
+  }
+
+  tab_imp=new_tab
+  conditions=new_conditions
+  repbio=new_repbio
+  reptech=new_reptech
+  conditions=factor(as.character(conditions),levels=as.character(unique(conditions)));
+  repbio=factor(as.character(repbio),levels=as.character(unique(repbio)));
+  reptech=factor(as.character(reptech),levels=as.character(unique(reptech)));
 
   nb_cond=length(levels(conditions));
   nb_rep=rep(0,nb_cond);
@@ -185,6 +211,8 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
 
     k=k+nb_rep[n];
   }
+
+  tab_imp[,index]=tab_imp
 
   return (tab_imp)
 }

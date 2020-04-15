@@ -55,18 +55,6 @@ proba=prob.mcar.tab(born$tab.upper,res);
 hist(proba[res.sim$list.MCAR[[1]],1],
 
 freq=FALSE,main="Estimated probabilities to be MCAR for known MCAR values",xlab="",col=2);
-
-#Histogram of probabilities to be MCAR associated to generated MNAR values
-hist(
-
-proba[which(is.na(res.sim$dat.obs[,1]))[
-
-!which(is.na(res.sim$dat.obs[,1]))\%in\%res.sim$list.MCAR[[1]]],1
-
-],
-
-freq=FALSE,main="Estimated probabilities to be MCAR for known MNAR values",xlab="",col=4
-);
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

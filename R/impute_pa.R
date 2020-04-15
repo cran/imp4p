@@ -11,7 +11,20 @@ impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distrib
     colnames(tab)=seq(1,ncol(tab),by=1)
   }
 
-  tab_imp = tab
+  tab_imp = as.matrix(tab)
+
+  new_tab=NULL
+  new_conditions=NULL
+  index=NULL
+  for (j in 1:length(levels(conditions))){
+    index=c(index,which(conditions==levels(conditions)[j]))
+    new_tab=cbind(new_tab,tab_imp[,which(conditions==levels(conditions)[j])])
+    new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
+  }
+
+  tab_imp=new_tab
+  conditions=new_conditions
+  conditions=factor(as.character(conditions),levels=as.character(unique(conditions)));
 
   qu = apply(tab_imp, 2, quantile, na.rm = TRUE, q.min)
 
@@ -70,6 +83,8 @@ impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distrib
     k = k + nb_rep[i]
 
   }
+
+  tab_imp[,index]=tab_imp
 
   return(list(tab.imp=tab_imp,para=param))
 

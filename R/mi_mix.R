@@ -5,9 +5,17 @@
 #
 ####################################
 
-mi.mix=function(tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
-                 reptech = NULL, nb.iter = 3, nknn = 15, weight = 1, selec = "all",
-                 siz = 500, ind.comp = 1, methodi = "mle", q = 0.95, progress.bar = TRUE, details= FALSE){
+mi.mix=function(tab, tab.imp, prob.MCAR, conditions, repbio = NULL, reptech = NULL, nb.iter = 3,
+                nknn = 15, weight = 1, selec = "all", siz = 500, ind.comp = 1, methodMCAR = "mle",
+                q = 0.95, progress.bar = TRUE, details= FALSE, ncp.max=5,
+                maxiter = 10, ntree = 100, variablewise = FALSE,
+                decreasing = FALSE, verbose = FALSE,
+                mtry = floor(sqrt(ncol(tab))), replace = TRUE,
+                classwt = NULL, cutoff = NULL, strata = NULL,
+                sampsize = NULL, nodesize = NULL, maxnodes = NULL,
+                xtrue = NA, parallelize = c('no', 'variables', 'forests'),
+                methodMNAR="igcda",q.min = 0.025, q.norm = 3, eps = 0,
+                distribution = "unif", param1 = 3, param2 = 1, R.q.min=1){
 
   if (is.null(repbio)) {repbio = as.factor(1:length(conditions));}
   if (is.null(reptech)) {reptech = as.factor(1:length(conditions));}
@@ -28,45 +36,77 @@ mi.mix=function(tab, tab.imp, prob.MCAR, conditions, repbio = NULL,
       cat(paste("\n", iter, "/", nb.iter, " - "))
     }
     tab.mvs = as.matrix(tab)
-    l.MCAR = matrix(mapply(prob.MCAR, FUN = rbinom, size = 1,
-                           n = 1), nrow(prob.MCAR), ncol(prob.MCAR))
+
+    #matrix of missing values
     l.NA[which(is.na(tab.mvs))] = 1
-    l.MNAR = l.NA - l.MCAR
+
+    #matrix of potential MCAR values
+    l.MCAR = matrix(mapply(prob.MCAR, FUN = rbinom, size = 1, n = 1), nrow(prob.MCAR), ncol(prob.MCAR))
+
+    #Missing and MCAR
     l.MCAR = l.NA * l.MCAR
-    l.MNAR = l.NA * l.MNAR
+
+    #Replace MCAR values by tab.imp values
     tab.mvs[which(l.MCAR == 1)] = tab.imp[which(l.MCAR == 1)]
+
     data_imp[, , iter] = tab.mvs
-    tab.mvs.imp = impute.igcda(tab = tab.mvs, tab.imp = tab.imp,
+
+    #Replace remaining missing values using MNAR-devoted algorithms
+    if (methodMNAR == "igcda"){
+        tab.mvs.imp = impute.igcda(tab = tab.mvs, tab.imp = tab.imp,
                                conditions = conditions, q = q)
+    }else{
+      tab.mvs.imp = impute.pa(tab = tab.mvs, conditions = conditions,
+                              q.min = q.min, q.norm = q.norm, eps = eps,
+                              distribution = distribution, param1 = param1,
+                              param2 = param2, R.q.min=R.q.min)
+    }
+
     if (progress.bar == TRUE) {
       cat(paste("Imputation MNAR OK - \n"))
     }
-    rna = apply(l.NA, 1, sum)
+
+    rna = rowSums(l.NA)
     rna = which(rna > 0)
+
     if (progress.bar == TRUE) {
       cat(paste("Imputation MCAR in progress - \n"))
     }
+
     for (i in 1:length(rna)) {
       tab.mod = tab.mvs.imp
       tab.mod.imp = tab.mod
       tab.mod[rna[i], ] = tab.mvs[rna[i], ]
-      if (methodi == "mle") {
-        lab = (1:nrow(tab.mod))[-rna[i]]
-        sel = selec
-        if (selec == "all") {sel = nrow(tab.mod) - 1;}
-        list.select = sample(lab, size = max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
-        list.select = c(list.select, rna[i])
+
+      lab = (1:nrow(tab.mod))[-rna[i]]
+      sel = selec
+      if (selec == "all") {sel = nrow(tab.mod) - 1;}
+      list.select = sample(lab, size = max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
+      list.select = c(list.select, rna[i])
+
+      if (methodMCAR == "mle") {
         tab.mod.imp[list.select, ] = impute.mle(tab.mod[list.select,], conditions = conditions);
-      }else {
-        lab = (1:nrow(tab.mod))[-rna[i]]
-        sel = selec
-        if (selec == "all") {sel = nrow(tab.mod) - 1;}
-        list.select = sample(lab, size = max(sel, min(siz,nrow(tab.mod) - 1)), replace = FALSE)
-        list.select = c(list.select, rna[i])
-        tab.mod.imp[list.select, ] = impute.slsa(tab.mod[list.select,], conditions = conditions, repbio = repbio,
+      }else{
+        if (methodMCAR == "rf") {
+          tab.mod.imp[list.select, ] = impute.RF(tab.mod[list.select,], conditions = conditions,
+                                                 maxiter = maxiter, ntree = ntree, variablewise = variablewise,
+                                                 decreasing = decreasing, verbose = verbose,
+                                                 mtry = mtry, replace = replace,
+                                                 classwt = classwt, cutoff = cutoff, strata = strata,
+                                                 sampsize = sampsize, nodesize = nodesize, maxnodes = maxnodes,
+                                                 xtrue = xtrue, parallelize = parallelize);
+        }else {
+          if (methodMCAR == "pca") {
+            tab.mod.imp[list.select, ] = impute.PCA(tab.mod[list.select,], conditions = conditions,
+                                                    ncp.max=ncp.max);
+          }else {
+            tab.mod.imp[list.select, ] = impute.slsa(tab.mod[list.select,], conditions = conditions, repbio = repbio,
                                                  reptech = reptech, nknn = nknn, weight = weight,
-                                                 selec = selec, progress.bar = FALSE, ind.comp = ind.comp)
+                                                 selec = selec, progress.bar = FALSE, ind.comp = ind.comp);
+          }
+        }
       }
+
       data_imp[rna[i], , iter] = tab.mod.imp[list.select,][length(list.select), ];
       if (progress.bar == TRUE) {
         if (i%/%floor(0.01 * length(rna)) == i/floor(0.01 *length(rna))) {
