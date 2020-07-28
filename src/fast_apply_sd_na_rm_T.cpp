@@ -29,44 +29,44 @@ template <class T>
   }
 
 NumericVector row_AXIlKpnLusRGZOyHYzIUs( NumericMatrix& X ) {
-  
+
   int nRows = X.nrow();
   NumericVector out = no_init(nRows);
-  
+
   for( int i=0; i < nRows; i++ ) {
     NumericMatrix::Row tmp = X(i, _);
     out[i] = do_AXIlKpnLusRGZOyHYzIU( tmp );
   }
-  
+
   return out;
-  
+
 }
 
 NumericVector col_AXIlKpnLusRGZOyHYzIUs( NumericMatrix& X ) {
-  
+
   int nCols = X.ncol();
   NumericVector out = no_init(nCols);
-  
+
   for( int j=0; j < nCols; j++ ) {
     NumericMatrix::Column tmp = X(_, j);
     out[j] = do_AXIlKpnLusRGZOyHYzIU( tmp );
   }
-  
+
   return out;
-  
+
 }
 
 // [[Rcpp::export]]
 NumericVector fast_apply_sd_na_rm_T( NumericMatrix X, int dim ) {
-  
+
   NumericVector a;
-  
+  a=NULL;
   if( dim == 1 ) {
     a=row_AXIlKpnLusRGZOyHYzIUs(X);
   } else if( dim == 2 ) {
     a=col_AXIlKpnLusRGZOyHYzIUs(X);
-  } 
-  
+  }
+
   return a;
 }
 

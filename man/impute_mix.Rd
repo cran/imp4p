@@ -58,14 +58,14 @@ param1 = 3, param2 = 1, R.q.min=1)
   \item{R.q.min}{parameter of the \code{\link{impute.pa}} function.}
 }
 \details{
-The missing values for which \code{prob.MCAR} is superior to a chosen threshold are imputed with one of the MCAR-devoted imputation methods (\code{\link{impute.mle}}, \code{\link{impute.RF}}, \code{\link{impute.PCA}} or \code{\link{impute.slsa}}). The other missing values are considered MNAR and imputed with \code{\link{impute.igcda}}.
+The missing values for which \code{prob.MCAR} is superior to a chosen threshold are imputed with one of the MCAR-devoted imputation methods (\code{\link{impute.mle}}, \code{\link{impute.RF}}, \code{\link{impute.PCA}} or \code{\link{impute.slsa}}). The other missing values are considered MNAR and imputed with \code{\link{impute.igcda}}. More details and explanations can be bound in Giai Gianetto (2020).
 }
 \value{
 The input matrix \code{tab} with imputed values instead of missing values.
 }
-%\references{
-%% ~put references to the literature/web site here ~
-%}
+\references{
+Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \href{https://doi.org/10.1101/2020.05.29.122770}{10.1101/2020.05.29.122770}
+}
 \author{
 Quentin Giai Gianetto <quentin2g@yahoo.fr>
 }
@@ -95,7 +95,7 @@ proba=prob.mcar.tab(born$tab.upper,res);
 
 #Imputation under the assumption of MCAR and MNAR values
 tabi=impute.mix(tab=res.sim$dat.obs, prob.MCAR=proba, threshold=0.5, conditions=res.sim$conditions,
-repbio=res.sim$repbio, methodMCAR="slsa", methodMNAR="igcda", nknn=15, weight=1, selec="all", 
+repbio=res.sim$repbio, methodMCAR="slsa", methodMNAR="igcda", nknn=15, weight=1, selec="all",
 ind.comp=1, progress.bar=TRUE);
 }
 }

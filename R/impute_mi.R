@@ -70,7 +70,7 @@ impute.mi=function(tab, conditions, repbio=NULL, reptech=NULL, nb.iter=3, nknn=1
 
   data.final=impute.pa(tab=data.mi, conditions=conditions, q.min=q.min, q.norm=q.norm, eps=eps);
 
-  return(data.final)
+  return(data.final$tab.imp)
 }
 
 

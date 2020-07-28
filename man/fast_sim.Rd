@@ -5,7 +5,7 @@
 Function to compute similarity measures between a vector and each row of a matrix.
 }
 \description{
-This function allows computing a similarity measure between a vector and each row of a matrix. The similarity measure is defined by exp(-d^2) where d is the Euclidean distance between the vector and each row. It is implemented thanks to the RCpp package.
+This function allows computing a similarity measure between a vector and each row of a matrix. The similarity measure is defined by d^2 where d is the Euclidean distance between the vector and each row. It is implemented thanks to the RCpp package.
 }
 \usage{
 fast_sim(prot, mat)

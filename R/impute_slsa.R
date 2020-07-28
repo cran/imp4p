@@ -8,13 +8,13 @@
 #sourceCpp("C:/Users/Quentin/Documents/article_imp4p/article/fast_sim.cpp")
 #Function to impute data sets with the SLSA algorithm
 
-impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec="all", weight=1, ind.comp=1, progress.bar=TRUE){
+impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=30, selec="all", weight="o", ind.comp=1, progress.bar=TRUE){
 
   if (is.null(repbio)){repbio=as.factor(1:length(conditions));}
   if (is.null(reptech)){reptech=as.factor(1:length(conditions));}
-  if (nknn>sqrt(nrow(tab))){nknn=floor(sqrt(nrow(tab)));warning("The number of nearest neighbours is too high.");}
-  if (nknn<=5){warning("The number of nearest neighbours is too low (<=5).");}
-  if (ncol(tab)<2){warning("The number of columns (samples) has to be superior to 1.");}
+  if (nknn>sqrt(nrow(tab))){nknn=floor(sqrt(nrow(tab)));warning(paste0("The chosen number of nearest neighbours is too high. It has been fixed to the maximum value (floor(sqrt(nrow(tab))): ",floor(sqrt(nrow(tab)))));}
+  if (nknn<=5){warning("The chosen number of nearest neighbours is too low (<=5).");}
+  if (ncol(tab)<2){warning("The number of columns (samples) has to be superior to 1 in tab.");}
 
   tab_imp=as.matrix(tab);
 
@@ -57,6 +57,12 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
 
     xincomplete1=tab_imp[,(k:(k+nb_rep[n]-1))];
 
+    #mediane normalisation to avoid gap effects in samples of a same condition
+    medxi1=apply(xincomplete1,2,median,na.rm=T)
+    for (j in 1:ncol(xincomplete1)){
+        xincomplete1[,j]=xincomplete1[,j]-medxi1[j]
+    }
+
     asd=fast_apply_sd_na_rm_T(xincomplete1,1);#apply(xincomplete1,1,sd,na.rm=T);
 
     #Imputation function for each row
@@ -65,7 +71,7 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
       if (progress.bar==TRUE){
         if (roww[1]%/%(floor(0.1*nrow(xincomplete1)))==roww[1]/(floor(0.1*nrow(xincomplete1)))){cat(c(0.1*(roww[1]%/%(floor(0.1*nrow(xincomplete1))))*100,"% - "));}
       }
-      #print(roww[1])
+      xnbr=roww[1]
       roww=roww[2:length(roww)];
       naroww=is.na(roww);
       # if at least one missing value else no imputation of the row
@@ -84,10 +90,11 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
           cand_x=xincomplete[, -row.exp, drop=F];
 
           #similarity measures:
-          #pairwise correlation if at least three side-by-side observed values
-          #euclidean distance between side-by-side observed values if length(prot)<3
+          #euclidean distance between side-by-side observed values
           sim=fast_sim(prot,cand_x);
-          sim=abs(sim);
+
+          sim=exp(-sqrt(sim));
+
           osim=order(sim, decreasing=T);
           #row.cand is the set of values from which linear models are fitted
           #row.impcand is the set of values allowing to predict responses from fitted linear models
@@ -159,19 +166,25 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
           nci=ncol(row.impcand);
           y=matrix(0, nrow=nri, ncol=nci);
 
+
           for(i in 1:nri) {
+
             if (is.matrix(row.cand)){
+
               mx=cbind(mm,row.cand[i,]);
               ll=!is.na(row.cand[i,]);
               mx=mx[ll,];
+
               if (is.matrix(mx)){
                 lg=lm.fit(x=mx,y=prot[ll])$coefficients;
                 lg[is.na(lg)]=0;
+                #if (sum(1*ll)<3){lg=rep(0,length(lg));}
               }else{lg=rep(0,length(mx));
-              lg[length(mx)]=prot[ll]/mx[length(mx)];
+                lg[length(mx)]=prot[ll]/mx[length(mx)];
+                #if (sum(1*ll)<3){lg=rep(0,length(lg));}
               }
             }else{lg=rep(0,length(mm)+1);
-            lg[length(lg)]=prot/row.cand[i];
+                  lg[length(lg)]=prot/row.cand[i];
             }
 
             mx1=cbind(mm1,row.impcand[i,]);
@@ -208,6 +221,10 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec=
     xmiss = t(apply(cbind(seq_len(nrow(xincomplete1)),xincomplete1), 1, imputeHLS));
 
     tab_imp[,(k:(k+nb_rep[n]-1))] = xmiss;
+
+    for (j in 1:ncol(tab_imp[,(k:(k+nb_rep[n]-1))])){
+      tab_imp[,(k:(k+nb_rep[n]-1))][,j]=tab_imp[,(k:(k+nb_rep[n]-1))][,j]+medxi1[j]
+    }
 
     k=k+nb_rep[n];
   }

@@ -8,7 +8,7 @@ Imputing missing values using an adaptation of the LSimpute algorithm (Bo et al.
 This function is an adaptation of the LSimpute algorithm (Bo et al. (2004)) to experimental designs usually met in MS-based quantitative proteomics.
 }
 \usage{
-impute.slsa(tab, conditions, repbio=NULL, reptech=NULL, nknn=15, selec="all", weight=1,
+impute.slsa(tab, conditions, repbio=NULL, reptech=NULL, nknn=30, selec="all", weight="o",
 ind.comp=1, progress.bar=TRUE)
   }
 %- maybe also 'usage' for other objects documented here.

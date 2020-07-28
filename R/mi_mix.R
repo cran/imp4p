@@ -60,6 +60,7 @@ mi.mix=function(tab, tab.imp, prob.MCAR, conditions, repbio = NULL, reptech = NU
                               q.min = q.min, q.norm = q.norm, eps = eps,
                               distribution = distribution, param1 = param1,
                               param2 = param2, R.q.min=R.q.min)
+      tab.mvs.imp = tab.mvs.imp$tab.imp
     }
 
     if (progress.bar == TRUE) {

@@ -18,6 +18,10 @@ inline NumericVector fast_si( NumericVector& prot, NumericMatrix& mat) {
   //double v_m=0;
   //double cov_mp=0;
   double d_m=0;
+  //double d_m2=0;
+  //double aa=0;
+  //double bb=0;
+  //double cc=0;
   NumericVector prot2(n);
   NumericVector corr(nr);
   for (int j = 0; j < nr; ++j) {
@@ -43,6 +47,15 @@ inline NumericVector fast_si( NumericVector& prot, NumericMatrix& mat) {
         }//else{nb_na_prot2+=1;}
       }//else{nb_na_prot+=1;}
     }
+    // aa=0;
+    // bb=0;
+    // cc=0;
+    // for (int i = 0; i < n; ++i) {
+    //   aa+=(prot[i]-m_p)*(prot2[i]-m_m);
+    //   bb+=(prot[i]-m_p)*(prot[i]-m_p);
+    //   cc+=(prot2[i]-m_m)*(prot2[i]-m_m);
+    // }
+    // d_m2=(aa)/(sqrt(bb)*sqrt(cc));
     //calcul de k+exp(-x^2/2)
     //nb de valeurs manquantes situ?es aux m?mes endroits divis?es par le nb de valeurs manquantes de prot
     //if (ind=1){
@@ -55,7 +68,11 @@ inline NumericVector fast_si( NumericVector& prot, NumericMatrix& mat) {
     //}else{
         if ( k>0 ){
           //Si prot a au moins une valeur en commun avec prot2
-          corr[j]=exp(-d_m);
+          if (k>1){
+              corr[j]=d_m;
+          }else{
+            corr[j]=d_m;
+          }
         }else{corr[j]=NA_REAL;}
     //}
   }

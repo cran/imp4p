@@ -9,7 +9,7 @@ This function simulates data sets similar to MS-based bottom-up proteomic data s
 }
 \usage{
 
-sim.data(nb.pept=10000,nb.miss=6000,pi.mcar=0.2,para=1.5,nb.cond=1,nb.repbio=3,
+sim.data(nb.pept=15000,nb.miss=5000,pi.mcar=0.2,para=3,nb.cond=1,nb.repbio=3,
 nb.sample=3,m.c=25,sd.c=2,sd.rb=0.5,sd.r=0.2)
 
 }

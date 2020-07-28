@@ -26,7 +26,7 @@ distribution = "unif", param1 = 3, param2 = 1, R.q.min=1);
   \item{repbio}{A vector of factors indicating the biological replicate to which each column belongs. Default is NULL (no experimental design is considered).}
   \item{reptech}{A vector of factors indicating the technical replicate to which each column belongs. Default is NULL (no experimental design is considered).}
   \item{nb.iter}{The number of iterations used for the multiple imputation method (see \code{\link{mi.mix}}).}
-  \item{methodMCAR}{The method used for imputing MCAR data. If \code{methodi="mle"} (default), then the \code{\link{impute.mle}} function is used (imputation using an EM algorithm). If \code{methodi="pca"}, then the \code{\link{impute.PCA}} function is used (imputation using Principal Component Analysis). If \code{methodi="rf"}, then the \code{\link{impute.RF}} function is used (imputation using Random Forest). Else, the \code{\link{impute.slsa}} function is used (imputation using Least Squares on nearest neighbours).}
+  \item{methodMCAR}{The method used for imputing MCAR data. If \code{methodMCAR="mle"} (default), then the \code{\link{impute.mle}} function is used (imputation using an EM algorithm). If \code{methodMCAR="pca"}, then the \code{\link{impute.PCA}} function is used (imputation using Principal Component Analysis). If \code{methodMCAR="rf"}, then the \code{\link{impute.RF}} function is used (imputation using Random Forest). Else, the \code{\link{impute.slsa}} function is used (imputation using Least Squares on nearest neighbours).}
   \item{methodMNAR}{The method used for imputing MNAR data. If \code{methodMNAR="igcda"} (default), then the \code{\link{impute.igcda}} function is used. Else, the \code{\link{impute.pa}} function is used.}
   \item{nknn}{The number of nearest neighbours used in the SLSA algorithm (see \code{\link{impute.slsa}}).}
   \item{selec}{A parameter to select a part of the dataset to find nearest neighbours between rows. This can be useful for big data sets (see \code{\link{impute.slsa}}).}
@@ -63,14 +63,14 @@ distribution = "unif", param1 = 3, param2 = 1, R.q.min=1);
   \item{R.q.min}{parameter of the \code{\link{impute.pa}} function.}
 }
 \details{
-First, a mixture model of MCAR and MNAR values is estimated in each column of \code{tab}. This model is used to estimate probabilities that each missing value is MCAR. Then, these probabilities are used to perform a multiple imputation strategy (see \code{\link{mi.mix}}). Rows with no value in a condition are imputed using the \code{\link{impute.pa}} function.
+First, a mixture model of MCAR and MNAR values is estimated in each column of \code{tab}. This model is used to estimate probabilities that each missing value is MCAR. Then, these probabilities are used to perform a multiple imputation strategy (see \code{\link{mi.mix}}). Rows with no value in a condition are imputed using the \code{\link{impute.pa}} function. More details and explanations can be bound in Giai Gianetto (2020).
 }
 \value{
 The input matrix \code{tab} with imputed values instead of missing values.
 }
-%\references{
-%% ~put references to the literature/web site here ~
-%}
+\references{
+Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \href{https://doi.org/10.1101/2020.05.29.122770}{10.1101/2020.05.29.122770}
+}
 \author{
 Quentin Giai Gianetto <quentin2g@yahoo.fr>
 }
