@@ -14,7 +14,7 @@ The main functions of this package are the \code{\link{estim.mix}} (estimation o
 
 Missing values has to be indicated with NA and a log-2 transformation of the intensities has to be applied before using these functions.
 
-More explanations and details on the functions of this package are available in Giai Gianetto et al.(2020).
+More explanations and details on the functions of this package are available in Giai Gianetto Q. et al. (2020) (doi: \doi{10.1101/2020.05.29.122770}).
 }
 %\details{
 %The DESCRIPTION file:
@@ -29,7 +29,7 @@ More explanations and details on the functions of this package are available in 
 Maintainer: Quentin Giai Gianetto <quentin2g@yahoo.fr>%\packageMaintainer{imp4p}
 }
 \references{
-Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \href{https://doi.org/10.1101/2020.05.29.122770}{10.1101/2020.05.29.122770}
+Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \doi{10.1101/2020.05.29.122770}
 }
 %~~ Optionally other standard keywords, one per line, from file KEYWORDS in ~~
 %~~ the R documentation directory ~~

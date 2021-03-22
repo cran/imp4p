@@ -5,7 +5,7 @@
 Imputation using a decision rule under an assumption of a mixture of MCAR and MNAR values.
 }
 \description{
-This function allows imputing data sets with a MCAR-devoted algorithm and a MNAR-devoted algorithm using probabilities that missing values are MCAR. If such a probability is superior to a chosen threshold, then the MCAR-devoted algorithm is used, otherwise it is the MNAR-devoted algorithm.
+This function allows imputing data sets with a MCAR-devoted algorithm and a MNAR-devoted algorithm using probabilities that missing values are MCAR. If such a probability is superior to a chosen threshold, then the MCAR-devoted algorithm is used, otherwise it is the MNAR-devoted algorithm. For details, see Giai Gianetto, Q. et al. (2020) (doi: \doi{10.1101/2020.05.29.122770}).
 }
 \usage{
 impute.mix(tab, prob.MCAR, threshold, conditions, repbio=NULL, reptech=NULL,
@@ -64,7 +64,7 @@ The missing values for which \code{prob.MCAR} is superior to a chosen threshold 
 The input matrix \code{tab} with imputed values instead of missing values.
 }
 \references{
-Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \href{https://doi.org/10.1101/2020.05.29.122770}{10.1101/2020.05.29.122770}
+Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \doi{10.1101/2020.05.29.122770}
 }
 \author{
 Quentin Giai Gianetto <quentin2g@yahoo.fr>

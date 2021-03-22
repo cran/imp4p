@@ -24,7 +24,7 @@ impute.PCA=function (tab, conditions, ncp.max=5) {
 
     nb_rep[n]=sum((conditions==levels(conditions)[n]));
     #print(nb_rep[n])
-    xincomplete=as.matrix(tab[,(k:(k+nb_rep[n]-1))]);
+    xincomplete=as.matrix(new_tab[,(k:(k+nb_rep[n]-1))]);
     nbna=fast_apply_nb_na(xincomplete,1);
     if (sum(nbna)>0){
       xincomplete1=xincomplete[which(nbna!=nb_rep[n]),];
@@ -42,6 +42,7 @@ impute.PCA=function (tab, conditions, ncp.max=5) {
   }
 
   tab_imp[,index]=tab_imp
+  colnames(tab_imp)=colnames(tab)
 
   return(tab_imp)
 }

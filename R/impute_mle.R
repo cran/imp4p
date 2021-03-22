@@ -1,5 +1,5 @@
 
-impute.mle=function (tab, conditions) {
+impute.mle = function (tab, conditions) {
 
   tab_imp=as.matrix(tab);
 
@@ -22,7 +22,7 @@ impute.mle=function (tab, conditions) {
 
   for (n in 1:nb_cond){
     nb_rep[n]=sum((conditions==levels(conditions)[n]));
-    xincomplete=as.matrix(tab[,(k:(k+nb_rep[n]-1))]);
+    xincomplete=as.matrix(new_tab[,(k:(k+nb_rep[n]-1))]);
     nbna=fast_apply_nb_na(xincomplete,1);
     if (sum(nbna)>0){
       xincomplete1=xincomplete[which(nbna!=nb_rep[n]),];
@@ -39,6 +39,7 @@ impute.mle=function (tab, conditions) {
   }
 
   tab_imp[,index]=tab_imp
+  colnames(tab_imp)=colnames(tab)
 
   return(tab_imp)
 }

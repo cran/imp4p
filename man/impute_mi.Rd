@@ -5,7 +5,7 @@
 Imputation of data sets containing peptide intensities with a multiple imputation strategy.
 }
 \description{
-This function allows imputing data sets containing peptide intensities with a multiple imputation strategy.
+This function allows imputing data sets containing peptide intensities with a multiple imputation strategy distinguishing MCAR and MNAR values. For details, see Giai Gianetto Q. et al. (2020) (doi: \doi{10.1101/2020.05.29.122770}).
 }
 \usage{
 impute.mi(tab, conditions, repbio=NULL, reptech=NULL, nb.iter=3, nknn=15, selec=1000,
@@ -69,7 +69,7 @@ First, a mixture model of MCAR and MNAR values is estimated in each column of \c
 The input matrix \code{tab} with imputed values instead of missing values.
 }
 \references{
-Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \href{https://doi.org/10.1101/2020.05.29.122770}{10.1101/2020.05.29.122770}
+Giai Gianetto, Q., Wieczorek S., Couté Y., Burger, T. (2020).  A peptide-level multiple imputation strategy accounting for the different natures of missing values in proteomics data. bioRxiv 2020.05.29.122770; doi: \doi{10.1101/2020.05.29.122770}
 }
 \author{
 Quentin Giai Gianetto <quentin2g@yahoo.fr>

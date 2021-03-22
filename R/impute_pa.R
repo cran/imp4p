@@ -80,11 +80,12 @@ impute.pa=function (tab, conditions, q.min = 0.025, q.norm = 3, eps = 0, distrib
 
     }
 
-    k = k + nb_rep[i]
+    k = k + nb_rep[i];
 
   }
 
   tab_imp[,index]=tab_imp
+  colnames(tab_imp)=colnames(tab)
 
   return(list(tab.imp=tab_imp,para=param))
 

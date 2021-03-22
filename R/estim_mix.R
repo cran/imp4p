@@ -8,6 +8,36 @@
 
 estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.rei=200){
 
+  if (length(colnames(tab))==0){
+    colnames(tab)=seq(1,ncol(tab),by=1)
+  }
+  if (length(colnames(tab.imp))==0){
+    colnames(tab.imp)=seq(1,ncol(tab.imp),by=1)
+  }
+  if (sum(colnames(tab.imp)!=colnames(tab))>0){
+        warning("tab and tab.imp does not have the same column names\n")
+  }
+  if (sum(is.na(tab.imp))>0){
+        warning("tab.imp contains missing values\n")
+  }
+  clnt=colnames(tab)
+
+  new_tab=NULL
+  new_tab.imp=NULL
+  new_conditions=NULL
+  index=NULL
+  for (j in 1:length(levels(conditions))){
+    index=c(index,which(conditions==levels(conditions)[j]))
+    new_tab=cbind(new_tab,tab[,which(conditions==levels(conditions)[j])])
+    new_tab.imp=cbind(new_tab.imp,tab.imp[,which(conditions==levels(conditions)[j])])
+    new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
+  }
+
+  tab=new_tab
+  tab.imp=new_tab.imp
+  conditions=new_conditions
+  conditions=factor(as.character(conditions),levels=as.character(unique(conditions)));
+
   #require(Iso);
   min.x=min(tab.imp,na.rm=TRUE);
   max.x=max(tab.imp,na.rm=TRUE);
@@ -100,6 +130,10 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
       ############
       #Rough estimation of the distribution of missing values in sample j
       v_na=tab_imp2[is.na(tab2[,j]),j];
+      if (length(v_na[!is.na(v_na)])<20){
+          warning(paste("Few missing values are found as imputed in the input imputed matrix (<20) in sample",
+                        colnames(tab)[j]))
+      }
       F_na=ecdf(v_na);
 
       ############
@@ -109,7 +143,7 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
       ############
       #Determination of the interval on which is estimated pi^MLE(x)
       #F_na(x)>0 et F_obs(x)>0
-      xmin=max(min(v_na),min(tab2[which(!is.na(tab2[,j])),j]));
+      xmin=max(min(v_na,na.rm=T),min(tab2[which(!is.na(tab2[,j])),j],na.rm=T));
       #F_na(x)<1 et F_obs(x)<1
       xmax=min(-sort(-v_na,na.last=T)[2],-sort(-tab2[which(!is.na(tab2[,j])),j],na.last=T)[2]);
       #initial interval
@@ -125,6 +159,13 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
       Mj=1
       while(pi_init[kMj]>=mean(pi_init)){Mj=absi[kMj];kMj=kMj+1;}
       abs[,j]=seq(Mj,xmax,length.out=x.step.pi);
+
+      absxm=(abs[,j]-xmin)
+      if (sum(absxm<0)>0){
+          absxm[absxm<0]=0;
+          warning(paste("Probably too few missing values in the sample",colnames(tab)[j],
+              ": unreliable estimation of distribution functions and of the proportion of MCAR values"));
+      }
 
       ############
       #Estimation of pi^MLE(x)
@@ -171,8 +212,9 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
         #d is initialized between 0.5 and 15
         init=c(runif(1,max(c(0,min(pi_init)-0.1)),min(c(min(pi_init)+0.1,1))),runif(1,0,1),runif(1,0.5,15))
         nbtest=1;
+
         #Find a working starting point for the minimization
-        while ((!inherits(try(optim(init, fr, gr=NULL, x=(abs[,j]-xmin) ,
+        while ((!inherits(try(optim(init, fr, gr=NULL, x=absxm,
                                     pi_est=pi_init, lower=c(max(c(0,min(pi_init)-0.1)),0,0.5),
                                     upper=c(min(c(min(pi_init)+0.1,1)),1,15), method="L-BFGS-B",
                                     w=(1/varasy)/(sum(1/varasy)), Ft=F_tot), TRUE), "try-error")==FALSE)&(nbtest<nb.rei)){
@@ -180,7 +222,7 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
           nbtest=nbtest+1;
         }
         #Minimization
-        re=optim(init, fr, gr=NULL, x=(abs[,j]-xmin) ,
+        re=optim(init, fr, gr=NULL, x=absxm ,
                  pi_est=pi_init, lower=c(0+1e-08,0,0.5),
                  upper=c(1-1e-08,1,15), method="L-BFGS-B",
                  w=(1/varasy)/(sum(1/varasy)), Ft=F_tot);
@@ -190,30 +232,30 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
         pim[nbit,4]=re$value[1]
       }
       #Final minimizations from the three best starting points and adding a small variation
-      re=optim(pim[order(pim[,4]),][1,1:3]+1e-3, fr, gr=NULL, x=(abs[,j]-xmin) ,
+      re=optim(pim[order(pim[,4]),][1,1:3]+1e-3, fr, gr=NULL, x=absxm ,
                pi_est=pi_init, lower=c(0+1e-08,0,0.5),
                upper=c(1-1e-08,1,10), method="L-BFGS-B",
                w=(1/varasy)/(sum(1/varasy)), Ft=F_tot);
       pim=rbind(pim,c(re$par[1],re$par[2],re$par[3],re$value));
-      re=optim(pim[order(pim[,4]),][2,1:3]+1e-3, fr, gr=NULL, x=(abs[,j]-xmin) ,
+      re=optim(pim[order(pim[,4]),][2,1:3]+1e-3, fr, gr=NULL, x=absxm ,
                pi_est=pi_init, lower=c(0+1e-08,0,0.5),
                upper=c(1-1e-08,1,10), method="L-BFGS-B",
                w=(1/varasy)/(sum(1/varasy)), Ft=F_tot);
       pim=rbind(pim,c(re$par[1],re$par[2],re$par[3],re$value));
-      re=optim(pim[order(pim[,4]),][3,1:3]+1e-3, fr, gr=NULL, x=(abs[,j]-xmin) ,
+      re=optim(pim[order(pim[,4]),][3,1:3]+1e-3, fr, gr=NULL, x=absxm ,
                pi_est=pi_init, lower=c(0+1e-08,0,0.5),
                upper=c(1-1e-08,1,10), method="L-BFGS-B",
                w=(1/varasy)/(sum(1/varasy)), Ft=F_tot);
       pim=rbind(pim,c(re$par[1],re$par[2],re$par[3],re$value));
 
-      #Final estimation of the proportion of MCAR values: the best of all the previous minimizations
+      #Final estimation of the proportion of MCAR values: the best of all previous minimizations
       pi_mcar[j]=pim[which.min(pim[,4]),1];
 
       MinRes[1:4,j]=pim[which.min(pim[,4]),1:4];
       ############
       #Find the normal distribution of complete values with
       #Regression between sufficiently high quantiles of observed values and normal quantiles
-      trend=pim[which.min(pim[,4]),1]+((1-pim[which.min(pim[,4]),1])/(1-F_tot))*exp(-pim[which.min(pim[,4]),2]*(abs[,j]-xmin)^(pim[which.min(pim[,4]),3]));
+      trend=pim[which.min(pim[,4]),1]+((1-pim[which.min(pim[,4]),1])/(1-F_tot))*exp(-pim[which.min(pim[,4]),2]*(absxm)^(pim[which.min(pim[,4]),3]));
       TREND_INIT[,j]=trend;
       pq=rep(0,length(trend))
       for (ii in 1:length(trend)){
@@ -257,6 +299,30 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
     k=k+nb_rep[i];
   }
 
+  #reordering outputs
+  abs[,index]=abs
+  PI_INIT[,index]=PI_INIT
+  VAR_PI_INIT[,index]=VAR_PI_INIT
+  TREND_INIT[,index]=TREND_INIT
+  pi_na[index]=pi_na
+  pi_mcar[index]=pi_mcar
+  FNA[,index]=FNA
+  FTOT[,index]=FTOT
+  FOBS[,index]=FOBS
+  MinRes[,index]=MinRes
+
+  colnames(abs)=clnt
+  colnames(PI_INIT)=clnt
+  colnames(VAR_PI_INIT)=clnt
+  colnames(TREND_INIT)=clnt
+  names(pi_na)=clnt
+  names(pi_mcar)=clnt
+  colnames(FNA)=clnt
+  colnames(FTOT)=clnt
+  colnames(FOBS)=clnt
+  colnames(MinRes)=clnt
+
   return(list(abs.pi=abs,pi.init=PI_INIT,var.pi.init=VAR_PI_INIT,trend.pi.init=TREND_INIT,
-              abs.mod=ABSC[,1],pi.na=pi_na,F.na=FNA,F.tot=FTOT,F.obs=FOBS,pi.mcar=pi_mcar,MinRes=MinRes));
+              abs.mod=ABSC[,1],pi.na=pi_na,F.na=FNA,F.tot=FTOT,F.obs=FOBS,
+              pi.mcar=pi_mcar,MinRes=MinRes));
 }

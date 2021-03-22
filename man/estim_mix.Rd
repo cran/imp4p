@@ -74,7 +74,7 @@ A list composed of:
   \item{F.tot}{A numeric matrix containing the estimated cumulative distribution functions of complete values in each column on the interval \code{abs.mod}.}
   \item{F.obs}{A numeric matrix containing the estimated cumulative distribution functions of observed values in each column on the interval \code{abs.mod}.}
   \item{pi.mcar}{A numeric vector containing the estimations of the proportion of MCAR values in each column.}
-  \item{MinRes}{A numeric matrix containing the three parameters of the model used in the minimization algorithm (three first rows) and the value of minimized function.}
+  \item{MinRes}{A numeric matrix containing the three parameters of the model used in the minimization algorithm (three first rows), and the value of minimized function.}
 }
 \author{
 Quentin Giai Gianetto <quentin2g@yahoo.fr>
