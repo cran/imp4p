@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // fast_apply_nb_na
 NumericVector fast_apply_nb_na(NumericMatrix X, int dim);
 RcppExport SEXP _imp4p_fast_apply_nb_na(SEXP XSEXP, SEXP dimSEXP) {

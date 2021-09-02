@@ -13,27 +13,31 @@ impute.slsa=function(tab, conditions, repbio=NULL, reptech=NULL, nknn=30, selec=
   if (is.null(repbio)){repbio=as.factor(1:length(conditions));}
   if (is.null(reptech)){reptech=as.factor(1:length(conditions));}
   if (nknn>sqrt(nrow(tab))){nknn=floor(sqrt(nrow(tab)));warning(paste0("The chosen number of nearest neighbours is too high. It has been fixed to the maximum value (floor(sqrt(nrow(tab))): ",floor(sqrt(nrow(tab)))));}
-  if (nknn<=5){warning("The chosen number of nearest neighbours is too low (<=5).");}
+  if (nknn<=5){warning("The chosen number of nearest neighbours is low (<=5).");}
   if (ncol(tab)<2){warning("The number of columns (samples) has to be superior to 1 in tab.");}
 
   tab_imp=as.matrix(tab);
 
-  new_tab=NULL
+  new_tab=tab
+  new_tab.imp=tab_imp
   new_conditions=NULL
   new_repbio=NULL
   new_reptech=NULL
   index=NULL
+  k=1
   for (j in 1:length(levels(conditions))){
-
     index=c(index,which(conditions==levels(conditions)[j]))
-    new_tab=cbind(new_tab,tab_imp[,which(conditions==levels(conditions)[j])])
+    nb_rep=sum((conditions==levels(conditions)[j]));
+    new_tab[,(k:(k+nb_rep-1))]=tab[,which(conditions==levels(conditions)[j])]
+    new_tab.imp[,(k:(k+nb_rep-1))]=tab_imp[,which(conditions==levels(conditions)[j])]
     new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
     new_repbio=c(new_repbio,repbio[which(conditions==levels(conditions)[j])])
     new_reptech=c(new_reptech,reptech[which(conditions==levels(conditions)[j])])
-
+    k=k+nb_rep
   }
 
-  tab_imp=new_tab
+  tab=new_tab
+  tab_imp=new_tab.imp
   conditions=new_conditions
   repbio=new_repbio
   reptech=new_reptech

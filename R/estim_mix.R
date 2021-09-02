@@ -22,15 +22,18 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
   }
   clnt=colnames(tab)
 
-  new_tab=NULL
-  new_tab.imp=NULL
+  new_tab=tab
+  new_tab.imp=tab.imp
   new_conditions=NULL
   index=NULL
+  k=1
   for (j in 1:length(levels(conditions))){
     index=c(index,which(conditions==levels(conditions)[j]))
-    new_tab=cbind(new_tab,tab[,which(conditions==levels(conditions)[j])])
-    new_tab.imp=cbind(new_tab.imp,tab.imp[,which(conditions==levels(conditions)[j])])
+    nb_rep=sum((conditions==levels(conditions)[j]));
+    new_tab[,(k:(k+nb_rep-1))]=tab[,which(conditions==levels(conditions)[j])]
+    new_tab.imp[,(k:(k+nb_rep-1))]=tab.imp[,which(conditions==levels(conditions)[j])]
     new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
+    k=k+nb_rep
   }
 
   tab=new_tab
@@ -60,7 +63,7 @@ estim.mix=function(tab, tab.imp, conditions, x.step.mod=150, x.step.pi=150, nb.r
     ll=(a*(v-1)*u-v*u+1)/(1-a)
     g=(1-delta*v)*delta*v*(((1/u)+v/ll)^2)/((1-a*u)^2)
     h=((1/a)-1)/(v*(1-u))+(1-delta*v)*delta*v*((1/v)+u/ll)^2
-    k=(1-delta*v)*((1-a)*ll^2)
+    k=(1-delta*v)/((1-a)*ll^2)
     av=(1-a)*h/(a*(g*h-k^2))
     return(av)
   }

@@ -3,6 +3,22 @@
 
 estim.bound=function(tab,conditions,q=0.95){
 
+  new_tab=tab
+  new_conditions=NULL
+  index=NULL
+  k=1
+  for (j in 1:length(levels(conditions))){
+    index=c(index,which(conditions==levels(conditions)[j]))
+    nb_rep=sum((conditions==levels(conditions)[j]));
+    new_tab[,(k:(k+nb_rep-1))]=tab[,which(conditions==levels(conditions)[j])]
+    new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
+    k=k+nb_rep
+  }
+
+  tab=new_tab
+  conditions=new_conditions
+  conditions=factor(as.character(conditions),levels=as.character(unique(conditions)));
+
   nb_cond=length(levels(conditions));
   nb_rep=rep(0,nb_cond);
   k=1;
@@ -31,5 +47,5 @@ estim.bound=function(tab,conditions,q=0.95){
   lb[lb==0]=NA;
   ub[ub==0]=NA;
 
-  return(list(tab.lower=lb,tab.upper=ub));
+  return(list(tab.lower=lb[,index],tab.upper=ub[,index]));
 }

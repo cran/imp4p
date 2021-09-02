@@ -9,16 +9,22 @@ impute.RF=function (tab, conditions,
 
   tab_imp=as.matrix(tab);
 
-  new_tab=NULL
+  new_tab=tab
+  new_tab.imp=tab_imp
   new_conditions=NULL
   index=NULL
+  k=1
   for (j in 1:length(levels(conditions))){
     index=c(index,which(conditions==levels(conditions)[j]))
-    new_tab=cbind(new_tab,tab_imp[,which(conditions==levels(conditions)[j])])
+    nb_rep=sum((conditions==levels(conditions)[j]));
+    new_tab[,(k:(k+nb_rep-1))]=tab[,which(conditions==levels(conditions)[j])]
+    new_tab.imp[,(k:(k+nb_rep-1))]=tab_imp[,which(conditions==levels(conditions)[j])]
     new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
+    k=k+nb_rep
   }
 
-  tab_imp=new_tab
+  tab=new_tab
+  tab_imp=new_tab.imp
   conditions=new_conditions
   conditions=factor(as.character(conditions),levels=as.character(unique(conditions)));
 

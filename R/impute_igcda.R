@@ -1,8 +1,27 @@
 
 #impute the data to get a gaussian distribution in each column
 
-impute.igcda=function (tab, tab.imp, conditions, q = 0.95) 
+impute.igcda=function (tab, tab.imp, conditions, q = 0.95)
 {
+  new_tab=tab
+  new_tab.imp=tab.imp
+  new_conditions=NULL
+  index=NULL
+  k=1
+  for (j in 1:length(levels(conditions))){
+    index=c(index,which(conditions==levels(conditions)[j]))
+    nb_rep=sum((conditions==levels(conditions)[j]));
+    new_tab[,(k:(k+nb_rep-1))]=tab[,which(conditions==levels(conditions)[j])]
+    new_tab.imp[,(k:(k+nb_rep-1))]=tab.imp[,which(conditions==levels(conditions)[j])]
+    new_conditions=c(new_conditions,conditions[which(conditions==levels(conditions)[j])])
+    k=k+nb_rep
+  }
+
+  tab=new_tab
+  tab.imp=new_tab.imp
+  conditions=new_conditions
+  conditions=factor(as.character(conditions),levels=as.character(unique(conditions)));
+
   dataSet.imputed = tab
   nb_cond = length(levels(conditions))
   nb_rep = rep(0, nb_cond)
@@ -25,17 +44,17 @@ impute.igcda=function (tab, tab.imp, conditions, q = 0.95)
           sta = Fobs(quantile(tab.imp[which(is.na(curr.sample)),j], 0.9, na.rm = T))
           gamma = sum(is.na(curr.sample))/length(curr.sample)
           if (sta>0.99){sta=0.99;}
-          interv = gamma + (1 - gamma) * seq(sta, 0.999, 
+          interv = gamma + (1 - gamma) * seq(sta, 0.999,
                                              length.out = 100)
           q.normal = qnorm(interv, mean = 0, sd = 1)
-          q.curr.sample = quantile(curr.sample, probs = seq(sta, 
+          q.curr.sample = quantile(curr.sample, probs = seq(sta,
                                                             0.999, length.out = 100), na.rm = T)
           q.curr.sample[which(!is.finite(q.curr.sample))] = NA
           q.normal[which(!is.finite(q.normal))] = NA
           temp.QR = lm(q.curr.sample ~ q.normal, na.action=na.omit)
           m = temp.QR$coefficients[1]
           v = (as.numeric(temp.QR$coefficients[2]))^2
-          dx = seq(mini - rangem, max(curr.sample, na.rm = T), 
+          dx = seq(mini - rangem, max(curr.sample, na.rm = T),
                    length.out = 1000)
           Fn = pnorm(dx, mean = m, sd = sqrt(v))
           Fna = (Fn - (1 - gamma) * Fobs(dx))/gamma
@@ -44,12 +63,12 @@ impute.igcda=function (tab, tab.imp, conditions, q = 0.95)
           pna = diff(Fna)
           gen.sample = NULL
           for (ll in 1:length(pna)) {
-            gen.sample = c(gen.sample, runif(floor(pna[ll] * 
-                                                     max(10000, sum(is.na(curr.sample)) + 1)), 
+            gen.sample = c(gen.sample, runif(floor(pna[ll] *
+                                                     max(10000, sum(is.na(curr.sample)) + 1)),
                                              dx[ll], dx[ll + 1]))
           }
           curr.sample.imputed = curr.sample
-          gss = gen.sample[floor(runif(sum(is.na(curr.sample)), 
+          gss = gen.sample[floor(runif(sum(is.na(curr.sample)),
                                        1, length(gen.sample) + 1))]
           curr.sample.imputed[which(is.na(curr.sample))][order(mim[which(is.na(curr.sample))])] = sort(gss)
           dataSet.imputed[, j] = curr.sample.imputed
@@ -66,5 +85,7 @@ impute.igcda=function (tab, tab.imp, conditions, q = 0.95)
   if (!is.null(jind)) {
     dataSet.imputed = impute.slsa(dataSet.imputed, conditions)
   }
+
+  dataSet.imputed[,index]=dataSet.imputed
   return(dataSet.imputed)
 }
